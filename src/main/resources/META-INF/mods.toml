@@ -18,3 +18,10 @@ Stops the player from drifting after they stop moving in creative flying mode.
     versionRange="[31,)"
     ordering="NONE"
     side="BOTH"
+[[dependencies.nocreativedrift]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.15.2]"
+    ordering="NONE"
+    side="BOTH"
+    
