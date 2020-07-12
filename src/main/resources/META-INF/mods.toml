@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[32,)"
+issueTrackerURL="https://github.com/DarkPred/NoCreativeDrift/issues"
+
+[[mods]]
+modId="nocreativedrift"
+version="${file.jarVersion}"
+displayName="NoCreativeDrift"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/nocreativedrift"
+
+logoFile="examplemod.png"
+authors="DarkPred"
+description='''
+Stops the player from drifting after they stop moving in creative flying mode.
+'''
+
+[[dependencies.nocreativedrift]]
+    modId="forge"
+    mandatory=true
+    versionRange="[32,)"
+    ordering="NONE"
+    side="BOTH"
+    
+[[dependencies.nocreativedrift]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.1]"
+    ordering="NONE"
+    side="BOTH"
