@@ -7,13 +7,11 @@ modId="nocreativedrift"
 version="${file.jarVersion}"
 displayName="NoCreativeDrift"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nocreativedrift"
-
-logoFile="examplemod.png"
 authors="DarkPred"
 description='''
 Stops the player from drifting after they stop moving in creative flying mode.
 '''
-
+# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.nocreativedrift]]
     modId="forge"
     mandatory=true
