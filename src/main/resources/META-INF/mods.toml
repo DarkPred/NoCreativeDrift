@@ -1,5 +1,6 @@
 modLoader="javafml"
 loaderVersion="[32,)"
+license="GNU General Public License v3.0"
 issueTrackerURL="https://github.com/DarkPred/NoCreativeDrift/issues"
 
 [[mods]]
@@ -22,6 +23,6 @@ Stops the player from drifting after they stop moving in creative flying mode.
 [[dependencies.nocreativedrift]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.1]"
+    versionRange="[1.16.4]"
     ordering="NONE"
     side="BOTH"
