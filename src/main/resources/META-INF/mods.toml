@@ -23,6 +23,12 @@ Stops the player from drifting after they stop moving in creative flying mode.
 [[dependencies.nocreativedrift]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.4]"
+    versionRange="[1.16.3,1.17)"
     ordering="NONE"
+    side="BOTH"
+[[dependencies.nocreativedrift]]
+    modId="simplyjetpacks"
+    mandatory=false
+    versionRange="[1.16.3, 1.17)"
+    ordering="AFTER"
     side="BOTH"
