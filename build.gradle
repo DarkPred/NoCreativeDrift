@@ -69,9 +69,15 @@ minecraft {
     }
 }
 
+repositories {
+    maven {
+        url "https://www.cursemaven.com"
+    }
+}
+
 dependencies {
     minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
-
+    compileOnly fg.deobf("curse.maven:simplyjetpacks-251792:3140699") //1.15.2-2.5.4.1
 }
 
 jar {

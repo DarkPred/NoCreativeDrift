@@ -24,4 +24,10 @@ Stops the player from drifting after they stop moving in creative flying mode.
     versionRange="[1.15.2]"
     ordering="NONE"
     side="BOTH"
+[[dependencies.nocreativedrift]]
+    modId="simplyjetpacks"
+    mandatory=false
+    versionRange="[1.15.2]"
+    ordering="AFTER"
+    side="BOTH"
     
