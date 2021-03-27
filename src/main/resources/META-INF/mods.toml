@@ -9,7 +9,7 @@ displayName="NoCreativeDrift"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nocreativedrift"
 authors="DarkPred"
 description='''
-Stops the player from drifting after they stop moving in creative flying mode.
+Stops the player from drifting after they stop flying.
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.nocreativedrift]]
@@ -26,6 +26,12 @@ Stops the player from drifting after they stop moving in creative flying mode.
     side="BOTH"
 [[dependencies.nocreativedrift]]
     modId="simplyjetpacks"
+    mandatory=false
+    versionRange="[1.15.2]"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.nocreativedrift]]
+    modId="ironjetpacks"
     mandatory=false
     versionRange="[1.15.2]"
     ordering="AFTER"
