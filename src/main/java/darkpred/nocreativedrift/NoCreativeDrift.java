@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 public class NoCreativeDrift {
     public static final String MOD_ID = "nocreativedrift";
     private static boolean simplyJetpacksLoaded = false;
+    private static boolean ironJetpacksLoaded = false;
 
     public NoCreativeDrift() {
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST,
@@ -23,9 +24,16 @@ public class NoCreativeDrift {
         if (ModList.get().getModFileById("simplyjetpacks") != null) {
             simplyJetpacksLoaded = true;
         }
+        if (ModList.get().getModFileById("ironjetpacks") != null) {
+            ironJetpacksLoaded = true;
+        }
     }
 
     public static boolean isSimplyJetpacksLoaded() {
         return simplyJetpacksLoaded;
+    }
+
+    public static boolean isIronJetpacksLoaded() {
+        return ironJetpacksLoaded;
     }
 }
