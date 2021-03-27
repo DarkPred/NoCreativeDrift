@@ -22,14 +22,21 @@ public class ClientEventHandler {
         if (event.phase == Phase.END && event.side == LogicalSide.CLIENT) {
             // Making sure that the player is creative flying
             if (event.player.isCreative() && event.player.abilities.isFlying && !event.player.isElytraFlying()) {
-                stopFlight(event);
+                stopDrift(event);
             }
-            if (!ClientConfig.disableJetpackDrift.get()) {
+            if (!ClientConfig.disableJetpackDrift.get().booleanValue()) {
                 ItemStack itemStack = event.player.getItemStackFromSlot(EquipmentSlotType.CHEST);
                 if (NoCreativeDrift.isSimplyJetpacksLoaded()) {
                     if (itemStack.getItem().getClass() == JetpackItem.class) {
                         if (((JetpackItem) itemStack.getItem()).isEngineOn(itemStack)) {
-                            stopFlight(event);
+                            stopDrift(event);
+                        }
+                    }
+                }
+                if (NoCreativeDrift.isIronJetpacksLoaded()) {
+                    if (itemStack.getItem().getClass() == com.blakebr0.ironjetpacks.item.JetpackItem.class) {
+                        if (((com.blakebr0.ironjetpacks.item.JetpackItem)itemStack.getItem()).isEngineOn(itemStack)) {
+                            stopDrift(event);
                         }
                     }
                 }
@@ -37,7 +44,7 @@ public class ClientEventHandler {
         }
     }
 
-    private static void stopFlight(PlayerTickEvent event) {
+    private static void stopDrift(PlayerTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
         // False if any horizontal movement key is being pressed
         if (!(mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown())) {
