@@ -79,6 +79,8 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
     compileOnly fg.deobf("curse.maven:simplyjetpacks-251792:3203659") //1.16.5-2.6.7.1
+    compileOnly fg.deobf("curse.maven:ironjetpacks-284497:3173404") //1.16.4-4.2.0
+    compileOnly fg.deobf("curse.maven:cucumber-272335:3249370") //1.16.4-4.1.9
 }
 jar {
     manifest {
