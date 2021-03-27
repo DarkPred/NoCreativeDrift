@@ -24,24 +24,24 @@ public class ClientEventHandler {
             if (event.player.isCreative() && event.player.abilities.isFlying && !event.player.isElytraFlying()) {
                 stopDrift(event);
             }
-            if (!ClientConfig.disableJetpackDrift.get().booleanValue()) {
+            if (!(boolean)ClientConfig.disableJetpackDrift.get()) {
                 ItemStack itemStack = event.player.getItemStackFromSlot(EquipmentSlotType.CHEST);
                 if (NoCreativeDrift.isSimplyJetpacksLoaded()) {
-                    if (itemStack.getItem().getClass() == JetpackItem.class) {
-                        if (((JetpackItem) itemStack.getItem()).isEngineOn(itemStack)) {
-                            stopDrift(event);
-                        }
+                    if (itemStack.getItem().getClass() == JetpackItem.class && isEngineOn(itemStack)) {
+                        stopDrift(event);
                     }
                 }
                 if (NoCreativeDrift.isIronJetpacksLoaded()) {
-                    if (itemStack.getItem().getClass() == com.blakebr0.ironjetpacks.item.JetpackItem.class) {
-                        if (((com.blakebr0.ironjetpacks.item.JetpackItem)itemStack.getItem()).isEngineOn(itemStack)) {
-                            stopDrift(event);
-                        }
+                    if (itemStack.getItem().getClass() == com.blakebr0.ironjetpacks.item.JetpackItem.class && isEngineOn(itemStack)) {
+                        stopDrift(event);
                     }
                 }
             }
         }
+    }
+
+    private static boolean isEngineOn(ItemStack itemStack) {
+        return itemStack.hasTag() && itemStack.getTag().getBoolean("Engine");
     }
 
     private static void stopDrift(PlayerTickEvent event) {
