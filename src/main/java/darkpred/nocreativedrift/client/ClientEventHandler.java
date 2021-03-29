@@ -25,7 +25,7 @@ public class ClientEventHandler {
         //Ensures that the code is only run once on the logical client
         if (event.phase == Phase.END && event.side == LogicalSide.CLIENT) {
             // Making sure that the player is creative flying
-            if (event.player.isCreative() && event.player.abilities.isFlying && !event.player.isElytraFlying()) {
+            if ((ClientConfig.disableNonCreativeDrift.get() || event.player.isCreative()) && event.player.abilities.isFlying) {
                 stopDrift(event);
             }
             if (Boolean.TRUE.equals(ClientConfig.disableJetpackDrift.get())) {
