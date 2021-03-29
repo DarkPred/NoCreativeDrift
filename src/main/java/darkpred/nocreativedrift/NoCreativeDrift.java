@@ -21,12 +21,9 @@ public class NoCreativeDrift {
 		ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
 		MinecraftForge.EVENT_BUS.register(this);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
-		if (ModList.get().getModFileById("simplyjetpacks") != null) {
-			simplyJetpacksLoaded = true;
-		}
-		if (ModList.get().getModFileById("ironjetpacks") != null) {
-			ironJetpacksLoaded = true;
-		}
+
+		simplyJetpacksLoaded = ModList.get().getModFileById("simplyjetpacks") != null;
+		ironJetpacksLoaded = ModList.get().getModFileById("ironjetpacks") != null;
 	}
 
 	public static boolean isSimplyJetpacksLoaded() {
