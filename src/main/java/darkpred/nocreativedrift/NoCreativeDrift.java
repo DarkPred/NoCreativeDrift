@@ -15,6 +15,7 @@ public class NoCreativeDrift {
     public static final String MOD_ID = "nocreativedrift";
     private static boolean simplyJetpacksLoaded = false;
     private static boolean ironJetpacksLoaded = false;
+    private static boolean mekanismLoaded = false;
 
     public NoCreativeDrift() {
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST,
@@ -24,6 +25,7 @@ public class NoCreativeDrift {
 
         simplyJetpacksLoaded = ModList.get().getModFileById("simplyjetpacks") != null;
         ironJetpacksLoaded = ModList.get().getModFileById("ironjetpacks") != null;
+        mekanismLoaded = ModList.get().getModFileById("mekanism") != null;
 
     }
 
@@ -33,5 +35,9 @@ public class NoCreativeDrift {
 
     public static boolean isIronJetpacksLoaded() {
         return ironJetpacksLoaded;
+    }
+
+    public static boolean isMekanismLoaded() {
+        return mekanismLoaded;
     }
 }
