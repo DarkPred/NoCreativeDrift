@@ -80,6 +80,7 @@ dependencies {
     compileOnly fg.deobf("curse.maven:simplyjetpacks-251792:3140699") //1.15.2-2.5.4.1
     compileOnly fg.deobf("curse.maven:ironjetpacks-284497:2993574") //1.15.2-3.0.3
     compileOnly fg.deobf("curse.maven:cucumber-272335:3014039") //1.15.2-3.0.9
+    compileOnly fg.deobf("curse.maven:mekanism-268560:2996531") //1.15.2-9.10.9.422
 }
 
 jar {

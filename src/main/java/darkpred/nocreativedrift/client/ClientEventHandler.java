@@ -2,6 +2,7 @@ package darkpred.nocreativedrift.client;
 
 import darkpred.nocreativedrift.NoCreativeDrift;
 import darkpred.nocreativedrift.config.ClientConfig;
+import mekanism.common.item.gear.ItemJetpack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
@@ -42,6 +43,12 @@ public class ClientEventHandler {
                         if (itemStack.getCapability(CapabilityEnergy.ENERGY).orElse(EMPTY_ENERGY_STORAGE).getEnergyStored() > 0) {
                             stopDrift(event);
                         }
+                    }
+                }
+                if (NoCreativeDrift.isMekanismLoaded()) {
+                    ItemJetpack.JetpackMode mode = ((ItemJetpack)itemStack.getItem()).getMode(itemStack);
+                    if (mode == ItemJetpack.JetpackMode.NORMAL || mode == ItemJetpack.JetpackMode.HOVER) {
+                        stopDrift(event);
                     }
                 }
             }
