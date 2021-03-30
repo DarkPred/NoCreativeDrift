@@ -1,12 +1,14 @@
 modLoader="javafml"
 loaderVersion="[31,)"
+license="GNU General Public License v3.0"
 issueTrackerURL="https://github.com/DarkPred/NoCreativeDrift/issues"
 
 [[mods]]
 modId="nocreativedrift"
-version="${file.jarVersion}"
+version="${version}"
 displayName="NoCreativeDrift"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nocreativedrift"
+logoFile="logo.png"
 authors="DarkPred"
 description='''
 Stops the player from drifting after they stop flying.

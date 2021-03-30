@@ -69,6 +69,13 @@ minecraft {
     }
 }
 
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        include "META-INF/mods.toml"
+        expand 'version':mod_version
+    }
+}
+
 repositories {
     maven {
         url "https://www.cursemaven.com"
