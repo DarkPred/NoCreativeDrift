@@ -17,10 +17,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import stormedpanda.simplyjetpacks.items.JetpackItem;
+import net.minecraft.util.math.vector.Vector3d;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class ClientEventHandler {
     private static final IEnergyStorage EMPTY_ENERGY_STORAGE = new EnergyStorage(0);
+    private static boolean keyJumpPressed = false;
+    private static boolean keySneakPressed = false;
 
     @SubscribeEvent
     public static void onPlayerTickEvent(PlayerTickEvent event) {
@@ -62,10 +65,25 @@ public class ClientEventHandler {
 
     private static void stopDrift(PlayerTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
+        Vector3d motion = event.player.getMotion();
         // False if any horizontal movement key is being pressed
         if (!(mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown())) {
             // Sets the players horizontal motion to 0
-            event.player.setMotion(0, event.player.getMotion().getY(), 0);
+            event.player.setMotion(0, motion.getY(), 0);
+        }
+        if (Boolean.TRUE.equals(ClientConfig.disableVerticalDrift.get())) {
+            if (keyJumpPressed && !mc.gameSettings.keyBindJump.isKeyDown()) {
+                event.player.setMotion(motion.getX(), 0, motion.getZ());
+                keyJumpPressed = false;
+            } else if (mc.gameSettings.keyBindJump.isKeyDown()) {
+                keyJumpPressed = true;
+            }
+            if (keySneakPressed && !mc.gameSettings.keyBindSneak.isKeyDown()) {
+                event.player.setMotion(motion.getX(), 0, motion.getZ());
+                keySneakPressed = false;
+            } else if (mc.gameSettings.keyBindSneak.isKeyDown()) {
+                keySneakPressed = true;
+            }
         }
     }
 }
