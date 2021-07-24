@@ -35,25 +35,8 @@ public class ClientEventHandler {
             }
             if (Boolean.TRUE.equals(ClientConfig.disableJetpackDrift.get())) {
                 ItemStack itemStack = event.player.getItemStackFromSlot(EquipmentSlotType.CHEST);
-                if (NoCreativeDrift.isSimplyJetpacksLoaded()) {
-                    if (itemStack.getItem() instanceof JetpackItem && isEngineOn(itemStack)) {
-                        if (itemStack.getTag() != null && itemStack.getTag().getInt("Energy") > 0) {
-                            stopDrift(event);
-                        }
-                    }
-                }
-                if (NoCreativeDrift.isIronJetpacksLoaded()) {
-                    if (itemStack.getItem() instanceof com.blakebr0.ironjetpacks.item.JetpackItem && isEngineOn(itemStack)) {
-                        if (itemStack.getCapability(CapabilityEnergy.ENERGY).orElse(EMPTY_ENERGY_STORAGE).getEnergyStored() > 0) {
-                            stopDrift(event);
-                        }
-                    }
-                }
-                if (NoCreativeDrift.isMekanismLoaded()) {
-                    ItemJetpack.JetpackMode mode = CommonPlayerTickHandler.getJetpackMode(itemStack);
-                    if (mode == ItemJetpack.JetpackMode.NORMAL || mode == ItemJetpack.JetpackMode.HOVER) {
-                        stopDrift(event);
-                    }
+                if (isSimplyJetpackOn(itemStack) || isIronJetpackOn(itemStack) || isMekanismJetpackOn(itemStack)) {
+                    stopDrift(event);
                 }
             }
         }
@@ -72,6 +55,13 @@ public class ClientEventHandler {
             event.player.setMotion(0, motion.getY(), 0);
         }
         if (Boolean.TRUE.equals(ClientConfig.disableVerticalDrift.get())) {
+            if (Boolean.TRUE.equals(ClientConfig.disableJetpackDrift.get())) {
+                ItemStack itemStack = event.player.getItemStackFromSlot(EquipmentSlotType.CHEST);
+                if (isMekanismJetpackOn(itemStack) || isIronJetpackOn(itemStack) || isSimplyJetpackOn(itemStack)) {
+                    return;
+                }
+            }
+
             if (keyJumpPressed && !mc.gameSettings.keyBindJump.isKeyDown()) {
                 event.player.setMotion(motion.getX(), 0, motion.getZ());
                 keyJumpPressed = false;
@@ -85,5 +75,31 @@ public class ClientEventHandler {
                 keySneakPressed = true;
             }
         }
+    }
+
+    private static boolean isMekanismJetpackOn(ItemStack itemStack) {
+        if (NoCreativeDrift.isMekanismLoaded()) {
+            ItemJetpack.JetpackMode mode = CommonPlayerTickHandler.getJetpackMode(itemStack);
+            return mode == ItemJetpack.JetpackMode.NORMAL || mode == ItemJetpack.JetpackMode.HOVER;
+        }
+        return false;
+    }
+
+    private static boolean isIronJetpackOn(ItemStack itemStack) {
+        if (NoCreativeDrift.isIronJetpacksLoaded()) {
+            if (itemStack.getItem() instanceof com.blakebr0.ironjetpacks.item.JetpackItem && isEngineOn(itemStack)) {
+                return itemStack.getCapability(CapabilityEnergy.ENERGY).orElse(EMPTY_ENERGY_STORAGE).getEnergyStored() > 0;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isSimplyJetpackOn(ItemStack itemStack) {
+        if (NoCreativeDrift.isSimplyJetpacksLoaded()) {
+            if (itemStack.getItem() instanceof JetpackItem && isEngineOn(itemStack)) {
+                return itemStack.getTag() != null && itemStack.getTag().getInt("Energy") > 0;
+            }
+        }
+        return false;
     }
 }
