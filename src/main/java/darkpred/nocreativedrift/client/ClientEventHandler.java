@@ -1,13 +1,19 @@
 package darkpred.nocreativedrift.client;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import darkpred.nocreativedrift.NoCreativeDrift;
 import darkpred.nocreativedrift.config.ClientConfig;
 import mekanism.common.CommonPlayerTickHandler;
 import mekanism.common.item.gear.ItemJetpack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -17,28 +23,52 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import stormedpanda.simplyjetpacks.items.JetpackItem;
-import net.minecraft.util.math.vector.Vector3d;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class ClientEventHandler {
     private static final IEnergyStorage EMPTY_ENERGY_STORAGE = new EnergyStorage(0);
     private static boolean keyJumpPressed = false;
     private static boolean keySneakPressed = false;
+    private static boolean keyToggleDriftPressed = false;
+    private static boolean driftDisabled = true;
 
     @SubscribeEvent
     public static void onPlayerTickEvent(PlayerTickEvent event) {
         //Ensures that the code is only run once on the logical client
-        if (event.phase == Phase.END && event.side == LogicalSide.CLIENT) {
+        if (event.phase == Phase.END && event.side == LogicalSide.CLIENT && driftDisabled) {
             // Making sure that the player is creative flying
-            if ((ClientConfig.disableNonCreativeDrift.get() || event.player.isCreative()) && event.player.abilities.isFlying) {
+            if ((ClientConfig.isRuleEnabled(ClientConfig.disableNonCreativeDrift) || event.player.isCreative()) && event.player.abilities.isFlying) {
                 stopDrift(event);
             }
-            if (Boolean.TRUE.equals(ClientConfig.disableJetpackDrift.get())) {
+            if (ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift)) {
                 ItemStack itemStack = event.player.getItemStackFromSlot(EquipmentSlotType.CHEST);
                 if (isSimplyJetpackOn(itemStack) || isIronJetpackOn(itemStack) || isMekanismJetpackOn(itemStack)) {
                     stopDrift(event);
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onKeyInputEvent(InputEvent.KeyInputEvent event) {
+        if (KeyBindList.toggleDrift.isKeyDown() != keyToggleDriftPressed && ClientConfig.isRuleEnabled(ClientConfig.enableToggleKeyBind)) {
+            if (keyToggleDriftPressed) {
+                driftDisabled = !driftDisabled;
+            }
+            keyToggleDriftPressed = KeyBindList.toggleDrift.isKeyDown();
+        }
+    }
+
+    @SubscribeEvent
+    public static void renderOverlay(RenderGameOverlayEvent.Post event) {
+        if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR && driftDisabled && ClientConfig.isRuleEnabled(
+                ClientConfig.enableHudMessage)) {
+            MatrixStack matrix = event.getMatrixStack();
+            matrix.push();
+            FontRenderer font = Minecraft.getInstance().fontRenderer;
+            float yPosition = (float) (ClientConfig.hudOffset.get() * event.getWindow().getScaledHeight());
+            font.func_243246_a(matrix, new StringTextComponent("Drift disabled"), 2, yPosition, 0xC8C8C8);
+            matrix.pop();
         }
     }
 
@@ -54,8 +84,8 @@ public class ClientEventHandler {
             // Sets the players horizontal motion to 0
             event.player.setMotion(0, motion.getY(), 0);
         }
-        if (Boolean.TRUE.equals(ClientConfig.disableVerticalDrift.get())) {
-            if (Boolean.TRUE.equals(ClientConfig.disableJetpackDrift.get())) {
+        if ((ClientConfig.isRuleEnabled(ClientConfig.disableVerticalDrift))) {
+            if ((ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift))) {
                 ItemStack itemStack = event.player.getItemStackFromSlot(EquipmentSlotType.CHEST);
                 if (isMekanismJetpackOn(itemStack) || isIronJetpackOn(itemStack) || isSimplyJetpackOn(itemStack)) {
                     return;
