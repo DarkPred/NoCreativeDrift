@@ -11,8 +11,12 @@ public class ClientConfig {
 
     public static final ForgeConfigSpec.BooleanValue disableJetpackDrift;
     public static final ForgeConfigSpec.BooleanValue disableNonCreativeDrift;
+    public static final ForgeConfigSpec.BooleanValue disableVerticalDrift;
 
     static {
+        disableVerticalDrift = BUILDER
+                .comment("Disable the drift during vertical flight")
+                .define("disableVerticalDrift", false);
         BUILDER.push("jetpack");
         disableJetpackDrift = BUILDER
                 .comment("Disable the drift on jetpacks.")
@@ -23,5 +27,9 @@ public class ClientConfig {
         BUILDER.pop();
 
         SPEC = BUILDER.build();
+    }
+
+    public static boolean isRuleEnabled(ForgeConfigSpec.BooleanValue rule) {
+        return Boolean.TRUE.equals(rule.get());
     }
 }
