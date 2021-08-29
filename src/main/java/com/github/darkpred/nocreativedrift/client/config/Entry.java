@@ -9,9 +9,7 @@ public class Entry {
     private String val;
 
     public Entry(String id, String val) {
-        this.comment = null;
-        this.id = id;
-        this.val = val;
+        this(null, id, val);
     }
 
     public Entry(String comment, String id, String val) {

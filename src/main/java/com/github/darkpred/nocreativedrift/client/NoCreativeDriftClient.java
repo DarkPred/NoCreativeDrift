@@ -4,18 +4,27 @@ import com.blakebr0.ironjetpacks.item.JetpackItem;
 import com.github.darkpred.nocreativedrift.client.config.ClientConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.Vec3d;
+import org.lwjgl.glfw.GLFW;
 import team.reborn.energy.Energy;
 
 public class NoCreativeDriftClient implements ClientModInitializer {
 
+    private static final KeyBinding toggleDrift = new KeyBinding(
+            "key.nocreativedrift.toggle_drift", GLFW.GLFW_KEY_C, "No Creative Drift");
     private boolean keyJumpPressed = false;
     private boolean keySneakPressed = false;
+    private boolean keyToggleDriftPressed = false;
+    private boolean driftDisabled = true;
 
     private static boolean isEngineOn(ItemStack itemStack) {
         return itemStack.getTag() != null && itemStack.getTag().getBoolean("Engine");
@@ -23,20 +32,40 @@ public class NoCreativeDriftClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        if (ClientConfig.CONFIG.getOrDefault("enableToggleKeyBind", false)) {
+            KeyBindingHelper.registerKeyBinding(toggleDrift);
+        }
         boolean ironJetpacksLoaded = FabricLoader.getInstance().isModLoaded("iron-jetpacks");
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ClientPlayerEntity player = client.player;
             if (player == null) return;
-            if (player.abilities.flying) {
-                stopDrift(player);
+            if (toggleDrift.isPressed() != keyToggleDriftPressed) {
+                if (keyToggleDriftPressed) {
+                    driftDisabled = !driftDisabled;
+                }
+                keyToggleDriftPressed = toggleDrift.isPressed();
             }
-            if (ironJetpacksLoaded && ClientConfig.CONFIG.getOrDefault("disableJetpackDrift", false)) {
-                ItemStack itemStack = player.getEquippedStack(EquipmentSlot.CHEST);
-                if (itemStack.getItem() instanceof JetpackItem && isEngineOn(itemStack)) {
-                    if (Energy.of(itemStack).getEnergy() > 0) {
-                        stopDrift(player);
+
+            if (driftDisabled) {
+                if (player.abilities.flying) {
+                    stopDrift(player);
+                }
+                if (ironJetpacksLoaded && ClientConfig.CONFIG.getOrDefault("disableJetpackDrift", false)) {
+                    ItemStack itemStack = player.getEquippedStack(EquipmentSlot.CHEST);
+                    if (itemStack.getItem() instanceof JetpackItem && isEngineOn(itemStack)) {
+                        if (Energy.of(itemStack).getEnergy() > 0) {
+                            stopDrift(player);
+                        }
                     }
                 }
+            }
+        });
+
+        HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> {
+            if (driftDisabled && ClientConfig.CONFIG.getOrDefault("enableHudMessage", false)) {
+                MinecraftClient mc = MinecraftClient.getInstance();
+                float yPosition = (float) (0.3 * mc.getWindow().getScaledHeight());
+                mc.textRenderer.drawWithShadow(matrixStack, new TranslatableText("hud.nocreativedrift.drift_disabled"), 2, yPosition, 0xC8C8C8);
             }
         });
     }
