@@ -10,6 +10,18 @@ archivesBaseName = project.archives_base_name
 version = project.minecraft_version + "-" + project.mod_version + "-fabric"
 group = project.maven_group
 
+repositories {
+    maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+    maven {
+        url "https://maven.shedaniel.me/"
+    }
+}
+
 dependencies {
     //to change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -21,7 +33,13 @@ dependencies {
     modCompile("teamreborn:energy:${project.tr_energy_version}") {
         transitive(false)
     }
-    modCompile "com.blakebr0.ironjetpacks:iron-jetpacks:${project.iron_jetpacks_version}"
+    modApi("me.sargunvohra.mcmods:autoconfig1u:3.2.0-unstable") {//dependency for cloth-api
+        transitive(false)
+    }
+    modApi("me.shedaniel.cloth.api:cloth-api:1.5.50") {//dependency for ironjetpacks
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    modImplementation "curse.maven:ironjetpacks-386892:3213023"
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
