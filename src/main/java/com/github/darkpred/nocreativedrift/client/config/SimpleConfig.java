@@ -1,4 +1,4 @@
-package com.github.darkpred.nocreativedrift.client;
+package com.github.darkpred.nocreativedrift.client.config;
 
 /*
  * Copyright (c) 2021 magistermaks
@@ -31,11 +31,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Copied from <a href="https://github.com/magistermaks/fabric-simplelibs/tree/master/simple-config">Here</a>
+ * and slightly modified to automatically update outdated configs
  */
 public class SimpleConfig {
 
@@ -44,51 +45,40 @@ public class SimpleConfig {
     private final ConfigRequest request;
     private boolean broken = false;
 
-    public interface DefaultConfig {
-        String get(String namespace);
+    private SimpleConfig(ConfigRequest request, int version) {
+        this.request = request;
+        String identifier = "Config '" + request.filename + "'";
 
-        static String empty(String namespace) {
-            return "";
-        }
-    }
+        if (!request.file.exists()) {
+            LOGGER.info("{} is missing, generating default one...", identifier);
 
-    public static class ConfigRequest {
-
-        private final File file;
-        private final String filename;
-        private DefaultConfig provider;
-
-        private ConfigRequest(File file, String filename) {
-            this.file = file;
-            this.filename = filename;
-            this.provider = DefaultConfig::empty;
+            try {
+                createConfig();
+            } catch (IOException e) {
+                LOGGER.error("{} failed to generate!", identifier);
+                LOGGER.trace(e);
+                broken = true;
+            }
         }
 
-        /**
-         * Sets the default config provider, used to generate the
-         * config if it's missing.
-         *
-         * @param provider default config provider
-         * @return current config request object
-         * @see DefaultConfig
-         */
-        public ConfigRequest provider(DefaultConfig provider) {
-            this.provider = provider;
-            return this;
-        }
-
-        /**
-         * Loads the config from the filesystem.
-         *
-         * @return config object
-         * @see SimpleConfig
-         */
-        public SimpleConfig request() {
-            return new SimpleConfig(this);
-        }
-
-        private String getConfig() {
-            return provider.get(filename) + "\n";
+        if (!broken) {
+            try {
+                loadConfig();
+            } catch (IOException e) {
+                LOGGER.error("{} failed to load!", identifier);
+                LOGGER.trace(e);
+                broken = true;
+            }
+            if (getOrDefault("Version", 0) != version) {
+                LOGGER.info("{} is outdated, updating lines...", identifier);
+                try {
+                    updateConfig();
+                } catch (IOException e) {
+                    LOGGER.error("{} failed to update!", identifier);
+                    LOGGER.trace(e);
+                    broken = true;
+                }
+            }
         }
 
     }
@@ -113,56 +103,54 @@ public class SimpleConfig {
 
         // write default config data
         PrintWriter writer = new PrintWriter(request.file, "UTF-8");
-        writer.write(request.getConfig());
+        for (Entry entry : request.getConfig()) {
+            writer.write(entry.getFullEntry() + "\n");
+        }
         writer.close();
 
+    }
+
+    private void updateConfig() throws IOException {
+        //Finds all correct config entries that should be copied over to updated file
+        Map<String, String> ids = new HashMap<>();
+        try (Scanner reader = new Scanner(request.file)) {
+            for (int line = 1; reader.hasNextLine(); line++) {
+                parseConfigEntry(reader.nextLine(), line, ids);
+            }
+        }
+        //Update current list of entries with old values
+        for (Entry entry : request.getConfig()) {
+            String id = entry.getId();
+            String val = ids.get(id);
+            if (ids.containsKey(id) && !id.equals("Version")) {
+                if ("true".equals(val) || "false".equals(val)) {
+                    entry.setVal(val);
+                }
+            }
+        }
+        //Rewrites config file with old values and new options
+        PrintWriter writer = new PrintWriter(request.file, "UTF-8");
+        writer.write(request.getConfig().stream().map(Entry::getFullEntry).collect(Collectors.joining("\n")));
+        writer.close();
     }
 
     private void loadConfig() throws IOException {
         try (Scanner reader = new Scanner(request.file)) {
             for (int line = 1; reader.hasNextLine(); line++) {
-                parseConfigEntry(reader.nextLine(), line);
+                parseConfigEntry(reader.nextLine(), line, config);
             }
         }
     }
 
-    private void parseConfigEntry(String entry, int line) {
+    private void parseConfigEntry(String entry, int line, Map<String, String> map) throws IOException {
         if (!entry.isEmpty() && !entry.startsWith("#")) {
             String[] parts = entry.split("=", 2);
             if (parts.length == 2) {
-                config.put(parts[0], parts[1]);
+                map.put(parts[0], parts[1]);
             } else {
-                throw new RuntimeException("Syntax error in config file on line " + line + "!");
+                throw new IOException("Syntax error in config file on line " + line + "!");
             }
         }
-    }
-
-    private SimpleConfig(ConfigRequest request) {
-        this.request = request;
-        String identifier = "Config '" + request.filename + "'";
-
-        if (!request.file.exists()) {
-            LOGGER.info(identifier + " is missing, generating default one...");
-
-            try {
-                createConfig();
-            } catch (IOException e) {
-                LOGGER.error(identifier + " failed to generate!");
-                LOGGER.trace(e);
-                broken = true;
-            }
-        }
-
-        if (!broken) {
-            try {
-                loadConfig();
-            } catch (Exception e) {
-                LOGGER.error(identifier + " failed to load!");
-                LOGGER.trace(e);
-                broken = true;
-            }
-        }
-
     }
 
     /**
@@ -172,7 +160,6 @@ public class SimpleConfig {
      * @return value corresponding to the given key
      * @see SimpleConfig#getOrDefault
      */
-    @Deprecated
     public String get(String key) {
         return config.get(key);
     }
@@ -248,8 +235,57 @@ public class SimpleConfig {
      * @return true if the operation was successful
      */
     public boolean delete() {
-        LOGGER.warn("Config '" + request.filename + "' was removed from existence! Restart the game to regenerate it.");
+        LOGGER.warn("Config '{}' was removed from existence! Restart the game to regenerate it.", request.filename);
         return request.file.delete();
+    }
+
+    public interface DefaultConfig {
+        static List<Entry> empty(String namespace) {
+            return new ArrayList<>();
+        }
+
+        List<Entry> get(String namespace);
+    }
+
+    public static class ConfigRequest {
+
+        private final File file;
+        private final String filename;
+        private DefaultConfig provider;
+
+        private ConfigRequest(File file, String filename) {
+            this.file = file;
+            this.filename = filename;
+            this.provider = DefaultConfig::empty;
+        }
+
+        /**
+         * Sets the default config provider, used to generate the
+         * config if it's missing.
+         *
+         * @param provider default config provider
+         * @return current config request object
+         * @see DefaultConfig
+         */
+        public ConfigRequest provider(DefaultConfig provider) {
+            this.provider = provider;
+            return this;
+        }
+
+        /**
+         * Loads the config from the filesystem.
+         *
+         * @return config object
+         * @see SimpleConfig
+         */
+        public SimpleConfig request(int version) {
+            return new SimpleConfig(this, version);
+        }
+
+        private List<Entry> getConfig() {
+            return provider.get(filename);
+        }
+
     }
 
 }
