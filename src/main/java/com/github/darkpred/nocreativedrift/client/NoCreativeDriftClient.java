@@ -1,6 +1,7 @@
 package com.github.darkpred.nocreativedrift.client;
 
 import com.blakebr0.ironjetpacks.item.JetpackItem;
+import com.github.darkpred.nocreativedrift.client.config.ClientConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -13,10 +14,6 @@ import team.reborn.energy.Energy;
 
 public class NoCreativeDriftClient implements ClientModInitializer {
 
-    private final SimpleConfig config = SimpleConfig.of("nocreativedrift").provider(namespace ->
-            "#Disable the drift during vertical flight\ndisableVerticalDrift=false\n" +
-                    "#Disable the drift on jetpacks\ndisableJetpackDrift=false\n"
-    ).request();
     private boolean keyJumpPressed = false;
     private boolean keySneakPressed = false;
 
@@ -33,7 +30,7 @@ public class NoCreativeDriftClient implements ClientModInitializer {
             if (player.abilities.flying) {
                 stopDrift(player);
             }
-            if (ironJetpacksLoaded && config.getOrDefault("disableJetpackDrift", false)) {
+            if (ironJetpacksLoaded && ClientConfig.CONFIG.getOrDefault("disableJetpackDrift", false)) {
                 ItemStack itemStack = player.getEquippedStack(EquipmentSlot.CHEST);
                 if (itemStack.getItem() instanceof JetpackItem && isEngineOn(itemStack)) {
                     if (Energy.of(itemStack).getEnergy() > 0) {
@@ -50,7 +47,7 @@ public class NoCreativeDriftClient implements ClientModInitializer {
         if (!(mc.options.keyForward.isPressed() || mc.options.keyBack.isPressed() || mc.options.keyLeft.isPressed() || mc.options.keyRight.isPressed())) {
             player.setVelocity(0, velocity.getY(), 0);
         }
-        if (config.getOrDefault("disableVerticalDrift", false)) {
+        if (ClientConfig.CONFIG.getOrDefault("disableVerticalDrift", false)) {
             if (keyJumpPressed && !mc.options.keyJump.isPressed()) {
                 player.setVelocity(velocity.getX(), 0, velocity.getZ());
                 keyJumpPressed = false;
