@@ -3,22 +3,48 @@ package com.github.darkpred.nocreativedrift.client;
 import com.github.darkpred.nocreativedrift.client.config.ClientConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.Vec3d;
+import org.lwjgl.glfw.GLFW;
 
 public class NoCreativeDriftClient implements ClientModInitializer {
 
+    private static final KeyBinding toggleDrift = new KeyBinding(
+            "key.nocreativedrift.toggle_drift", GLFW.GLFW_KEY_C, "No Creative Drift");
     private boolean keyJumpPressed = false;
     private boolean keySneakPressed = false;
+    private boolean keyToggleDriftPressed = false;
+    private boolean driftDisabled = true;
 
     @Override
     public void onInitializeClient() {
+        if (ClientConfig.CONFIG.getOrDefault("enableToggleKeyBind", false)) {
+            KeyBindingHelper.registerKeyBinding(toggleDrift);
+        }
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ClientPlayerEntity player = client.player;
             if (player == null) return;
-            if (player.getAbilities().flying) {
+            if (toggleDrift.isPressed() != keyToggleDriftPressed) {
+                if (keyToggleDriftPressed) {
+                    driftDisabled = !driftDisabled;
+                }
+                keyToggleDriftPressed = toggleDrift.isPressed();
+            }
+            if (driftDisabled && player.getAbilities().flying) {
                 stopDrift(player);
+            }
+        });
+
+        HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> {
+            if (driftDisabled && ClientConfig.CONFIG.getOrDefault("enableHudMessage", false)) {
+                MinecraftClient mc = MinecraftClient.getInstance();
+                float yPosition = (float) (0.3 * mc.getWindow().getScaledHeight());
+                mc.textRenderer.drawWithShadow(matrixStack, new TranslatableText("hud.nocreativedrift.drift_disabled"), 2, yPosition, 0xC8C8C8);
             }
         });
     }
