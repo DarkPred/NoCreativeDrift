@@ -90,11 +90,12 @@ public class NoCreativeDriftClient implements ClientModInitializer {
         Vec3d velocity = player.getVelocity();
         //If no movement keys are pressed slow down player. Seems to work fine with pistons and stuff
         if (!(mc.options.keyForward.isPressed() || mc.options.keyBack.isPressed() || mc.options.keyLeft.isPressed() || mc.options.keyRight.isPressed())) {
-            player.setVelocity(velocity.getY() * curDrift().getMulti(), velocity.getY(), velocity.getZ() * curDrift().getMulti());
+            player.setVelocity(velocity.getX() * curDrift().getMulti(), velocity.getY(), velocity.getZ() * curDrift().getMulti());
         }
         if (ClientConfig.CONFIG.getOrDefault("disableVerticalDrift", false)) {
             if (keyJumpPressed && !mc.options.keyJump.isPressed()) {
                 //Multiplier only applied once but that's fine because there is barely no drift anyway
+                //TODO: Jetpacks are not very affected by this
                 player.setVelocity(velocity.getX(), velocity.getY() * curDrift().getMulti(), velocity.getZ());
                 keyJumpPressed = false;
             } else if (mc.options.keyJump.isPressed()) {
