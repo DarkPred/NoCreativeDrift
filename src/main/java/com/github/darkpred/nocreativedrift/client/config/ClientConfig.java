@@ -3,6 +3,9 @@ package com.github.darkpred.nocreativedrift.client.config;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class holding the client config entries and latest version
+ */
 public class ClientConfig {
     public static final List<Entry> ENTRIES = new ArrayList<>();
     public static final int LATEST_VERSION = 4; //The latest version of the config file to check updates

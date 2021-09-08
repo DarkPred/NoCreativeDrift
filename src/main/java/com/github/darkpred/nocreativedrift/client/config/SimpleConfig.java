@@ -111,6 +111,11 @@ public class SimpleConfig {
 
     }
 
+    /**
+     * Updates the config by saving values that should be copied over to the updated file and then rewriting the entire file
+     *
+     * @throws IOException if the file is not found
+     */
     private void updateConfig() throws IOException {
         //Finds all correct config entries that should be copied over to updated file
         Map<String, String> ids = new HashMap<>();
