@@ -66,16 +66,17 @@ public class SimpleConfig {
                 loadConfig();
             } catch (IOException e) {
                 LOGGER.error("{} failed to load!", identifier);
-                LOGGER.trace(e);
+                LOGGER.error(e);
                 broken = true;
             }
             if (getOrDefault("Version", 0) != version) {
                 LOGGER.info("{} is outdated, updating lines...", identifier);
                 try {
                     updateConfig();
+                    loadConfig();
                 } catch (IOException e) {
-                    LOGGER.error("{} failed to update!", identifier);
-                    LOGGER.trace(e);
+                    LOGGER.error("{} failed to update! Config not loaded", identifier);
+                    LOGGER.error(e);
                     broken = true;
                 }
             }
@@ -110,12 +111,21 @@ public class SimpleConfig {
 
     }
 
+    /**
+     * Updates the config by saving values that should be copied over to the updated file and then rewriting the entire file
+     *
+     * @throws IOException if the file is not found
+     */
     private void updateConfig() throws IOException {
         //Finds all correct config entries that should be copied over to updated file
         Map<String, String> ids = new HashMap<>();
         try (Scanner reader = new Scanner(request.file)) {
             for (int line = 1; reader.hasNextLine(); line++) {
-                parseConfigEntry(reader.nextLine(), line, ids);
+                try {
+                    parseConfigEntry(reader.nextLine(), line, ids);
+                } catch (IOException e) {
+                    //skip
+                }
             }
         }
         //Update current list of entries with old values
