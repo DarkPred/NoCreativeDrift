@@ -3,12 +3,8 @@ package darkpred.nocreativedrift.config;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ClientConfig {
-    private ClientConfig() {
-    }
-
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
-
     public static final ForgeConfigSpec.BooleanValue disableJetpackDrift;
     public static final ForgeConfigSpec.BooleanValue enableToggleKeyBind;
     public static final ForgeConfigSpec.BooleanValue enableHudMessage;
@@ -25,7 +21,7 @@ public class ClientConfig {
                 .comment("Enable a key bind that toggles drift in game")
                 .define("enableToggleKeyBind", false);
         enableHudMessage = BUILDER
-                .comment("Enable whether a message should be shown when the drift is disabled")
+                .comment("Enable a hud message that displays the current drift strength", "I recommend this if enableToggleKeyBind is set to true")
                 .define("enableHudMessage", false);
         hudOffset = BUILDER
                 .comment("Vertical position of the hud message on the left side (0 is top, 0.95 is bottom)")
@@ -41,6 +37,9 @@ public class ClientConfig {
         BUILDER.pop();
 
         SPEC = BUILDER.build();
+    }
+
+    private ClientConfig() {
     }
 
     public static boolean isRuleEnabled(ForgeConfigSpec.BooleanValue rule) {

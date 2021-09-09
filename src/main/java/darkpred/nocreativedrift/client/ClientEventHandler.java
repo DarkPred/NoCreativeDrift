@@ -24,18 +24,28 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import stormedpanda.simplyjetpacks.items.JetpackItem;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class ClientEventHandler {
     private static final IEnergyStorage EMPTY_ENERGY_STORAGE = new EnergyStorage(0);
+    private static final Deque<Drift> DRIFT = new ArrayDeque<>();
     private static boolean keyJumpPressed = false;
     private static boolean keySneakPressed = false;
     private static boolean keyToggleDriftPressed = false;
-    private static boolean driftDisabled = true;
+
+    static {
+        DRIFT.add(Drift.VANILLA);
+        DRIFT.add(Drift.STRONG);
+        DRIFT.add(Drift.WEAK);
+        DRIFT.add(Drift.DISABLED);
+    }
 
     @SubscribeEvent
     public static void onPlayerTickEvent(PlayerTickEvent event) {
         //Ensures that the code is only run once on the logical client
-        if (event.phase == Phase.END && event.side == LogicalSide.CLIENT && driftDisabled) {
+        if (event.phase == Phase.END && event.side == LogicalSide.CLIENT) {
             // Making sure that the player is creative flying
             if ((ClientConfig.isRuleEnabled(ClientConfig.disableNonCreativeDrift) || event.player.isCreative()) && event.player.abilities.isFlying) {
                 stopDrift(event);
@@ -51,9 +61,9 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onKeyInputEvent(InputEvent.KeyInputEvent event) {
-        if (KeyBindList.toggleDrift.isKeyDown() != keyToggleDriftPressed && ClientConfig.isRuleEnabled(ClientConfig.enableToggleKeyBind)) {
-            if (keyToggleDriftPressed) {
-                driftDisabled = !driftDisabled;
+        if (keyToggleDriftPressed != KeyBindList.toggleDrift.isKeyDown()) {
+            if (!keyToggleDriftPressed) {
+                DRIFT.add(DRIFT.pop());
             }
             keyToggleDriftPressed = KeyBindList.toggleDrift.isKeyDown();
         }
@@ -61,13 +71,12 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void renderOverlay(RenderGameOverlayEvent.Post event) {
-        if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR && driftDisabled && ClientConfig.isRuleEnabled(
-                ClientConfig.enableHudMessage)) {
+        if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR && ClientConfig.isRuleEnabled(ClientConfig.enableHudMessage)) {
             MatrixStack matrix = event.getMatrixStack();
             matrix.push();
             FontRenderer font = Minecraft.getInstance().fontRenderer;
             float yPosition = (float) (ClientConfig.hudOffset.get() * event.getWindow().getScaledHeight());
-            font.func_243246_a(matrix, new StringTextComponent("Drift disabled"), 2, yPosition, 0xC8C8C8);
+            font.func_243246_a(matrix, new StringTextComponent("Drift: " + curDrift().name()), 2, yPosition, 0xC8C8C8);
             matrix.pop();
         }
     }
@@ -82,7 +91,7 @@ public class ClientEventHandler {
         // False if any horizontal movement key is being pressed
         if (!(mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown())) {
             // Sets the players horizontal motion to 0
-            event.player.setMotion(0, motion.getY(), 0);
+            event.player.setMotion(motion.getX() * curDrift().getMulti(), motion.getY(), motion.getZ() * curDrift().getMulti());
         }
         if ((ClientConfig.isRuleEnabled(ClientConfig.disableVerticalDrift))) {
             if ((ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift))) {
@@ -93,13 +102,13 @@ public class ClientEventHandler {
             }
 
             if (keyJumpPressed && !mc.gameSettings.keyBindJump.isKeyDown()) {
-                event.player.setMotion(motion.getX(), 0, motion.getZ());
+                event.player.setMotion(motion.getX(), motion.getY() * curDrift().getMulti(), motion.getZ());
                 keyJumpPressed = false;
             } else if (mc.gameSettings.keyBindJump.isKeyDown()) {
                 keyJumpPressed = true;
             }
             if (keySneakPressed && !mc.gameSettings.keyBindSneak.isKeyDown()) {
-                event.player.setMotion(motion.getX(), 0, motion.getZ());
+                event.player.setMotion(motion.getX(), motion.getY() * curDrift().getMulti(), motion.getZ());
                 keySneakPressed = false;
             } else if (mc.gameSettings.keyBindSneak.isKeyDown()) {
                 keySneakPressed = true;
@@ -131,5 +140,13 @@ public class ClientEventHandler {
             }
         }
         return false;
+    }
+
+    private static Drift curDrift() {
+        Drift ret = DRIFT.peek();
+        if (ret == null) {
+            ret = Drift.DISABLED;
+        }
+        return ret;
     }
 }
