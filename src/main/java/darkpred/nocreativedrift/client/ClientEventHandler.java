@@ -6,11 +6,10 @@ import darkpred.nocreativedrift.config.ClientConfig;
 import mekanism.common.CommonPlayerTickHandler;
 import mekanism.common.item.gear.ItemJetpack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -74,9 +73,9 @@ public class ClientEventHandler {
         if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR && ClientConfig.isRuleEnabled(ClientConfig.enableHudMessage)) {
             MatrixStack matrix = event.getMatrixStack();
             matrix.push();
-            FontRenderer font = Minecraft.getInstance().fontRenderer;
             float yPosition = (float) (ClientConfig.hudOffset.get() * event.getWindow().getScaledHeight());
-            font.func_243246_a(matrix, new StringTextComponent("Drift: " + curDrift().name()), 2, yPosition, 0xC8C8C8);
+            TranslationTextComponent text = new TranslationTextComponent("hud.nocreativedrift.drift_strength", curDrift().getTextComponent());
+            Minecraft.getInstance().fontRenderer.func_243246_a(matrix, text, 2, yPosition, 0xC8C8C8);
             matrix.pop();
         }
     }
