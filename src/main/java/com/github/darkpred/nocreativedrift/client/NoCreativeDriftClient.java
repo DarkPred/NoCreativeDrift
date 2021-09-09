@@ -12,6 +12,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
 import team.reborn.energy.Energy;
@@ -70,7 +71,7 @@ public class NoCreativeDriftClient implements ClientModInitializer {
                 ItemStack itemStack = player.getEquippedStack(EquipmentSlot.CHEST);
                 if (itemStack.getItem() instanceof JetpackItem && isEngineOn(itemStack)) {
                     if (Energy.of(itemStack).getEnergy() > 0) {
-                        stopDrift(player);
+                        stopHorizontalDrift(player);
                     }
                 }
             }
@@ -80,22 +81,31 @@ public class NoCreativeDriftClient implements ClientModInitializer {
             if (ClientConfig.CONFIG.getOrDefault("enableHudMessage", false)) {
                 MinecraftClient mc = MinecraftClient.getInstance();
                 float yPosition = (float) (0.3 * mc.getWindow().getScaledHeight());
-                mc.textRenderer.drawWithShadow(matrixStack, "Drift: " + curDrift().name(), 2, yPosition, 0xC8C8C8);//TODO: Implement Translations
+                TranslatableText text = new TranslatableText("hud.nocreativedrift.drift_strength", curDrift().getText());
+                mc.textRenderer.drawWithShadow(matrixStack, text, 2, yPosition, 0xEEEBF0);
             }
         });
     }
 
+    private void stopHorizontalDrift(ClientPlayerEntity player) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        Vec3d velocity = player.getVelocity();
+        if (!(mc.options.keyForward.isPressed() || mc.options.keyBack.isPressed() || mc.options.keyLeft.isPressed() || mc.options.keyRight.isPressed())) {
+            player.setVelocity(velocity.getX() * curDrift().getMulti(), velocity.getY(), velocity.getZ() * curDrift().getMulti());
+        }
+    }
+
+    /**
+     * Currently not used for jetpacks
+     */
     private void stopDrift(ClientPlayerEntity player) {
         MinecraftClient mc = MinecraftClient.getInstance();
         Vec3d velocity = player.getVelocity();
         //If no movement keys are pressed slow down player. Seems to work fine with pistons and stuff
-        if (!(mc.options.keyForward.isPressed() || mc.options.keyBack.isPressed() || mc.options.keyLeft.isPressed() || mc.options.keyRight.isPressed())) {
-            player.setVelocity(velocity.getX() * curDrift().getMulti(), velocity.getY(), velocity.getZ() * curDrift().getMulti());
-        }
+        stopHorizontalDrift(player);
         if (ClientConfig.CONFIG.getOrDefault("disableVerticalDrift", false)) {
             if (keyJumpPressed && !mc.options.keyJump.isPressed()) {
                 //Multiplier only applied once but that's fine because there is barely no drift anyway
-                //TODO: Jetpacks are not very affected by this
                 player.setVelocity(velocity.getX(), velocity.getY() * curDrift().getMulti(), velocity.getZ());
                 keyJumpPressed = false;
             } else if (mc.options.keyJump.isPressed()) {
