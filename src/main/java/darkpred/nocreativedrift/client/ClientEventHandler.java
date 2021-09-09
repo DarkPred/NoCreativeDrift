@@ -88,9 +88,9 @@ public class ClientEventHandler {
     private static void stopDrift(PlayerTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
         Vector3d motion = event.player.getMotion();
-        // False if any horizontal movement key is being pressed
+        //If no movement keys are pressed slow down player. Seems to work fine with pistons and stuff
         if (!(mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown())) {
-            // Sets the players horizontal motion to 0
+            // Sets the players horizontal motion to current * drift multiplier
             event.player.setMotion(motion.getX() * curDrift().getMulti(), motion.getY(), motion.getZ() * curDrift().getMulti());
         }
         if ((ClientConfig.isRuleEnabled(ClientConfig.disableVerticalDrift))) {
@@ -102,6 +102,7 @@ public class ClientEventHandler {
             }
 
             if (keyJumpPressed && !mc.gameSettings.keyBindJump.isKeyDown()) {
+                //Multiplier only applied once but that's fine because there is barely no drift anyway
                 event.player.setMotion(motion.getX(), motion.getY() * curDrift().getMulti(), motion.getZ());
                 keyJumpPressed = false;
             } else if (mc.gameSettings.keyBindJump.isKeyDown()) {

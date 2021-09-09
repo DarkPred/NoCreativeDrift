@@ -1,5 +1,8 @@
 package darkpred.nocreativedrift.client;
 
+/**
+ * The strength categories with their multiplier
+ */
 public enum Drift {
     VANILLA(1),
     STRONG(0.90),
@@ -12,6 +15,11 @@ public enum Drift {
         this.multi = multi;
     }
 
+    /**
+     * Returns the strength multiplier of this category. Needs to be high because the vanilla drift is exponential
+     *
+     * @return the strength multiplier of this category
+     */
     public double getMulti() {
         return multi;
     }

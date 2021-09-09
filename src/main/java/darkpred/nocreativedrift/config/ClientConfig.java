@@ -2,6 +2,9 @@ package darkpred.nocreativedrift.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
+/**
+ * Class holding the client config entries
+ */
 public class ClientConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
