@@ -11,6 +11,7 @@ public class ClientConfig {
     public static final ForgeConfigSpec.BooleanValue disableJetpackDrift;
     public static final ForgeConfigSpec.BooleanValue enableToggleKeyBind;
     public static final ForgeConfigSpec.BooleanValue enableHudMessage;
+    public static final ForgeConfigSpec.BooleanValue enableHudFading;
     public static final ForgeConfigSpec.DoubleValue hudOffset;
     public static final ForgeConfigSpec.BooleanValue disableNonCreativeDrift;
     public static final ForgeConfigSpec.BooleanValue disableVerticalDrift;
@@ -26,6 +27,9 @@ public class ClientConfig {
         enableHudMessage = BUILDER
                 .comment("Enable a hud message that displays the current drift strength", "I recommend this if enableToggleKeyBind is set to true")
                 .define("enableHudMessage", false);
+        enableHudFading = BUILDER
+                .comment("If enabled the hud message will only be visible for a few seconds after changing the strength")
+                .define("enableHudFading", false);
         hudOffset = BUILDER
                 .comment("Vertical position of the hud message on the left side (0 is top, 0.95 is bottom)")
                 .defineInRange("hudOffset", 0.4, 0, 0.95);

@@ -33,6 +33,7 @@ public class ClientEventHandler {
     private static boolean keyJumpPressed = false;
     private static boolean keySneakPressed = false;
     private static boolean keyToggleDriftPressed = false;
+    private static float opacity = 5.0f;
 
     static {
         DRIFT.add(Drift.VANILLA);
@@ -63,6 +64,7 @@ public class ClientEventHandler {
         if (keyToggleDriftPressed != KeyBindList.toggleDrift.isKeyDown()) {
             if (!keyToggleDriftPressed) {
                 DRIFT.add(DRIFT.pop());
+                opacity = 5.0f;
             }
             keyToggleDriftPressed = KeyBindList.toggleDrift.isKeyDown();
         }
@@ -70,14 +72,29 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void renderOverlay(RenderGameOverlayEvent.Post event) {
+        if (ClientConfig.isRuleEnabled(ClientConfig.enableHudFading)) {
+            opacity = Math.max(opacity - 0.05f, 0);
+            if (opacity <= 0) {
+                return;
+            }
+        }
         if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR && ClientConfig.isRuleEnabled(ClientConfig.enableHudMessage)) {
             MatrixStack matrix = event.getMatrixStack();
             matrix.push();
             float yPosition = (float) (ClientConfig.hudOffset.get() * event.getWindow().getScaledHeight());
             TranslationTextComponent text = new TranslationTextComponent("hud.nocreativedrift.drift_strength", curDrift().getTextComponent());
-            Minecraft.getInstance().fontRenderer.func_243246_a(matrix, text, 2, yPosition, 0xC8C8C8);
+            int color = addOpacityToColor(opacity, "EEEBF0");
+            Minecraft.getInstance().fontRenderer.func_243246_a(matrix, text, 2, yPosition, color);
             matrix.pop();
         }
+    }
+
+    /**
+     * Adds opacity to a given hex color. Does not work with opacity of 0
+     */
+    private static int addOpacityToColor(float opacity, String hexColor) {
+        opacity = Math.min(opacity, 1);
+        return Integer.parseUnsignedInt(Integer.toHexString((int) (opacity * 255)) + hexColor, 16);
     }
 
     private static boolean isEngineOn(ItemStack itemStack) {
