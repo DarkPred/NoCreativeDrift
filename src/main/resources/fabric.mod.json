@@ -19,6 +19,9 @@
       "com.github.darkpred.nocreativedrift.client.NoCreativeDriftClient"
     ]
   },
+  "mixins": [
+    "nocreativedrift.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=0.11.3",
     "fabric": "*",
