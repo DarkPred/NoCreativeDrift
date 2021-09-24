@@ -22,6 +22,7 @@ package com.github.darkpred.nocreativedrift.client.config;
  * THE SOFTWARE.
  */
 
+import com.github.darkpred.nocreativedrift.client.WorldSaveCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 
 /**
  * Copied from <a href="https://github.com/magistermaks/fabric-simplelibs/tree/master/simple-config">Here</a>
- * and slightly modified to automatically update outdated configs
+ * and slightly modified to automatically update outdated configs and save on world save
  */
 public class SimpleConfig {
 
@@ -44,6 +45,7 @@ public class SimpleConfig {
     private final HashMap<String, String> config = new HashMap<>();
     private final ConfigRequest request;
     private boolean broken = false;
+    private boolean dirty = false;
 
     private SimpleConfig(ConfigRequest request, int version) {
         this.request = request;
@@ -81,7 +83,26 @@ public class SimpleConfig {
                 }
             }
         }
-
+        WorldSaveCallback.EVENT.register(() -> {
+            if (dirty) {
+                dirty = false;
+                try {
+                    PrintWriter writer = new PrintWriter(request.file, "UTF-8");
+                    for (Entry entry : request.getConfig()) {
+                        if (entry.isDirty()) {
+                            entry.setDirty(false);
+                        } else {
+                            entry.setVal(config.get(entry.getId()));
+                        }
+                        writer.write(entry.getFullEntry() + "\n");
+                    }
+                    writer.close();
+                    loadConfig();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
@@ -133,7 +154,7 @@ public class SimpleConfig {
             String id = entry.getId();
             String val = ids.get(id);
             if (ids.containsKey(id) && !id.equals("Version")) {
-                if ("true".equals(val) || "false".equals(val)) {
+                if (entry.isValidValue(val)) {
                     entry.setVal(val);
                 }
             }
@@ -225,6 +246,32 @@ public class SimpleConfig {
             return Double.parseDouble(get(key));
         } catch (Exception e) {
             return def;
+        }
+    }
+
+    public void set(String key, boolean def) {
+        if (def != Boolean.parseBoolean(get(key))) {
+            config.put(key, String.valueOf(def));
+            dirty = true;
+            for (Entry entry : request.getConfig()) {
+                if (entry.getId().equals(key)) {
+                    entry.setVal(String.valueOf(def));
+                    entry.setDirty(true);
+                }
+            }
+        }
+    }
+
+    public void set(String key, int def) {
+        if (def != Integer.parseInt(get(key))) {
+            config.put(key, String.valueOf(def));
+            dirty = true;
+            for (Entry entry : request.getConfig()) {
+                if (entry.getId().equals(key)) {
+                    entry.setVal(String.valueOf(def));
+                    entry.setDirty(true);
+                }
+            }
         }
     }
 

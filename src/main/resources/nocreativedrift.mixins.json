@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.github.darkpred.nocreativedrift.mixin.client",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "MixinServerWorld"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
