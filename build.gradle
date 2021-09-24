@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.7-SNAPSHOT'
+    id 'fabric-loom' version '0.9-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -30,7 +30,7 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modCompile("teamreborn:energy:${project.tr_energy_version}") {
+    modImplementation("teamreborn:energy:${project.tr_energy_version}") {
         transitive(false)
     }
     modApi("me.sargunvohra.mcmods:autoconfig1u:3.2.0-unstable") {//dependency for cloth-api
@@ -46,6 +46,7 @@ dependencies {
 }
 
 processResources {
+    duplicatesStrategy = 'include'
     inputs.property "version", project.version
 
     from(sourceSets.main.resources.srcDirs) {
