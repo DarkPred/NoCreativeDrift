@@ -1,5 +1,7 @@
 package darkpred.nocreativedrift;
 
+import darkpred.nocreativedrift.client.ClientEventHandler;
+import darkpred.nocreativedrift.client.Drift;
 import darkpred.nocreativedrift.client.KeyBindList;
 import darkpred.nocreativedrift.config.ClientConfig;
 import net.minecraftforge.common.MinecraftForge;
@@ -49,5 +51,6 @@ public class NoCreativeDrift {
         if (ClientConfig.isRuleEnabled(ClientConfig.enableToggleKeyBind)) {
             ClientRegistry.registerKeyBinding(KeyBindList.toggleDrift);
         }
+        ClientEventHandler.setCurDrift(Drift.values()[ClientConfig.driftStrength.get()]);
     }
 }

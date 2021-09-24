@@ -8,6 +8,7 @@ import mekanism.common.item.gear.ItemJetpack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,6 +19,7 @@ import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
@@ -29,21 +31,34 @@ import java.util.Deque;
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class ClientEventHandler {
     private static final IEnergyStorage EMPTY_ENERGY_STORAGE = new EnergyStorage(0);
-    private static final Deque<Drift> DRIFT = new ArrayDeque<>();
+    private static final Deque<Drift> DRIFT_QUEUE = new ArrayDeque<>();
     private static boolean keyJumpPressed = false;
     private static boolean keySneakPressed = false;
     private static boolean keyToggleDriftPressed = false;
     private static float opacity = 5.0f;
+    private static boolean dirty;
 
     static {
-        DRIFT.add(Drift.VANILLA);
-        DRIFT.add(Drift.STRONG);
-        DRIFT.add(Drift.WEAK);
-        DRIFT.add(Drift.DISABLED);
+        DRIFT_QUEUE.add(Drift.VANILLA);
+        DRIFT_QUEUE.add(Drift.STRONG);
+        DRIFT_QUEUE.add(Drift.WEAK);
+        DRIFT_QUEUE.add(Drift.DISABLED);
+    }
+
+    @SubscribeEvent
+    public static void onWorldTickEvent(WorldEvent.Save event) {
+        IntegratedServer mcs = Minecraft.getInstance().getIntegratedServer();
+        if (mcs != null) {
+            if (dirty) {
+                ClientConfig.driftStrength.set(DRIFT_QUEUE.peek().ordinal());
+                dirty = false;
+            }
+        }
     }
 
     @SubscribeEvent
     public static void onPlayerTickEvent(PlayerTickEvent event) {
+        opacity = Math.max(opacity - 0.05f, 0);
         //Ensures that the code is only run once on the logical client
         if (event.phase == Phase.END && event.side == LogicalSide.CLIENT) {
             // Making sure that the player is creative flying
@@ -63,8 +78,9 @@ public class ClientEventHandler {
     public static void onKeyInputEvent(InputEvent.KeyInputEvent event) {
         if (keyToggleDriftPressed != KeyBindList.toggleDrift.isKeyDown()) {
             if (!keyToggleDriftPressed) {
-                DRIFT.add(DRIFT.pop());
+                DRIFT_QUEUE.add(DRIFT_QUEUE.pop());
                 opacity = 5.0f;
+                dirty = true;
             }
             keyToggleDriftPressed = KeyBindList.toggleDrift.isKeyDown();
         }
@@ -73,7 +89,6 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void renderOverlay(RenderGameOverlayEvent.Post event) {
         if (ClientConfig.isRuleEnabled(ClientConfig.enableHudFading)) {
-            opacity = Math.max(opacity - 0.05f, 0);
             if (opacity <= 0) {
                 return;
             }
@@ -82,7 +97,7 @@ public class ClientEventHandler {
             MatrixStack matrix = event.getMatrixStack();
             matrix.push();
             float yPosition = (float) (ClientConfig.hudOffset.get() * event.getWindow().getScaledHeight());
-            TranslationTextComponent text = new TranslationTextComponent("hud.nocreativedrift.drift_strength", curDrift().getTextComponent());
+            TranslationTextComponent text = new TranslationTextComponent("hud.nocreativedrift.drift_strength", getCurDrift().getTextComponent());
             int color = addOpacityToColor(opacity, "EEEBF0");
             Minecraft.getInstance().fontRenderer.func_243246_a(matrix, text, 2, yPosition, color);
             matrix.pop();
@@ -107,7 +122,7 @@ public class ClientEventHandler {
         //If no movement keys are pressed slow down player. Seems to work fine with pistons and stuff
         if (!(mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown())) {
             // Sets the players horizontal motion to current * drift multiplier
-            event.player.setMotion(motion.getX() * curDrift().getMulti(), motion.getY(), motion.getZ() * curDrift().getMulti());
+            event.player.setMotion(motion.getX() * getCurDrift().getMulti(), motion.getY(), motion.getZ() * getCurDrift().getMulti());
         }
         if ((ClientConfig.isRuleEnabled(ClientConfig.disableVerticalDrift))) {
             if ((ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift))) {
@@ -119,13 +134,13 @@ public class ClientEventHandler {
 
             if (keyJumpPressed && !mc.gameSettings.keyBindJump.isKeyDown()) {
                 //Multiplier only applied once but that's fine because there is barely no drift anyway
-                event.player.setMotion(motion.getX(), motion.getY() * curDrift().getMulti(), motion.getZ());
+                event.player.setMotion(motion.getX(), motion.getY() * getCurDrift().getMulti(), motion.getZ());
                 keyJumpPressed = false;
             } else if (mc.gameSettings.keyBindJump.isKeyDown()) {
                 keyJumpPressed = true;
             }
             if (keySneakPressed && !mc.gameSettings.keyBindSneak.isKeyDown()) {
-                event.player.setMotion(motion.getX(), motion.getY() * curDrift().getMulti(), motion.getZ());
+                event.player.setMotion(motion.getX(), motion.getY() * getCurDrift().getMulti(), motion.getZ());
                 keySneakPressed = false;
             } else if (mc.gameSettings.keyBindSneak.isKeyDown()) {
                 keySneakPressed = true;
@@ -159,11 +174,19 @@ public class ClientEventHandler {
         return false;
     }
 
-    private static Drift curDrift() {
-        Drift ret = DRIFT.peek();
+    public static Drift getCurDrift() {
+        Drift ret = DRIFT_QUEUE.peek();
         if (ret == null) {
             ret = Drift.DISABLED;
         }
         return ret;
+    }
+
+    public static void setCurDrift(Drift drift) {
+        for (int i = 0; i < DRIFT_QUEUE.size(); i++) {
+            if (DRIFT_QUEUE.peek() != drift) {
+                DRIFT_QUEUE.add(DRIFT_QUEUE.pop());
+            }
+        }
     }
 }

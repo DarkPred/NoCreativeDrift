@@ -15,6 +15,7 @@ public class ClientConfig {
     public static final ForgeConfigSpec.DoubleValue hudOffset;
     public static final ForgeConfigSpec.BooleanValue disableNonCreativeDrift;
     public static final ForgeConfigSpec.BooleanValue disableVerticalDrift;
+    public static final ForgeConfigSpec.IntValue driftStrength;
 
     static {
         disableVerticalDrift = BUILDER
@@ -41,6 +42,11 @@ public class ClientConfig {
         disableNonCreativeDrift = BUILDER
                 .comment("Disable the drift during non creative flight (e.g. Angel Ring mod)")
                 .define("disableNonCreativeDrift", false);
+        BUILDER.pop();
+        BUILDER.push("other");
+        driftStrength = BUILDER
+                .comment("The current drift strength. {Vanilla:0, Strong:1, Weak:2, Disabled:3}")
+                .defineInRange("driftStrength", 3, 0, 3);
         BUILDER.pop();
 
         SPEC = BUILDER.build();
