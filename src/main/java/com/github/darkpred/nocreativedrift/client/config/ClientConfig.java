@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class ClientConfig {
     public static final List<Entry> ENTRIES = new ArrayList<>();
-    public static final int LATEST_VERSION = 4; //The latest version of the config file to check updates
+    public static final int LATEST_VERSION = 5; //The latest version of the config file to check updates
 
     public static final SimpleConfig CONFIG;
 
@@ -19,6 +19,8 @@ public class ClientConfig {
         ENTRIES.add(new BoolEntry("#Enable a key bind that toggles drift in game", "enableToggleKeyBind", false));
         ENTRIES.add(new BoolEntry("#Enable a hud message that displays the current drift strength " +
                 "\n#I recommend this if enableToggleKeyBind is set to true", "enableHudMessage", false));
+        ENTRIES.add(new BoolEntry("#If enabled the hud message will only be visible for a few seconds after changing the strength",
+                "enableHudFading", false));
         ENTRIES.add(new IntEntry.Range("#The current drift strength. {Vanilla:0, Strong:1, Weak:2, Disabled:3}",
                 "driftStrength", 3, 0, 3));
 
