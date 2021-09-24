@@ -50,6 +50,7 @@ public class NoCreativeDriftClient implements ClientModInitializer {
             if (toggleDrift.isPressed() != keyToggleDriftPressed) {
                 if (!keyToggleDriftPressed) {
                     DRIFT.add(DRIFT.pop());
+                    ClientConfig.CONFIG.set("driftStrength", DRIFT.peek().ordinal());
                 }
                 keyToggleDriftPressed = toggleDrift.isPressed();
             }
