@@ -1,16 +1,15 @@
 package darkpred.nocreativedrift.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import darkpred.nocreativedrift.NoCreativeDrift;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.settings.KeyConflictContext;
-import org.lwjgl.glfw.GLFW;
 
 public class KeyBindList {
 
-    public static final KeyBinding toggleDrift = new KeyBinding(
-            Util.makeTranslationKey("key", new ResourceLocation(NoCreativeDrift.MOD_ID, "toggle_drift")),
-            KeyConflictContext.IN_GAME, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_C, "No Creative Drift");
+    public static final KeyMapping toggleDrift = new KeyMapping(
+            Util.makeDescriptionId("key", new ResourceLocation(NoCreativeDrift.MOD_ID, "toggle_drift")),
+            KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, InputConstants.KEY_C, "No Creative Drift");
 }
