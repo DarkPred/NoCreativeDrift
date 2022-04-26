@@ -29,6 +29,8 @@ import java.util.Deque;
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class ClientEventHandler {
     private static final IEnergyStorage EMPTY_ENERGY_STORAGE = new EnergyStorage(0);
+
+    private static DriftMessageHud driftHud = new DriftMessageHud();
     private static final Deque<Drift> DRIFT_QUEUE = new ArrayDeque<>();
     private static boolean keyJumpPressed = false;
     private static boolean keySneakPressed = false;
@@ -40,6 +42,10 @@ public class ClientEventHandler {
         DRIFT_QUEUE.add(Drift.STRONG);
         DRIFT_QUEUE.add(Drift.WEAK);
         DRIFT_QUEUE.add(Drift.DISABLED);
+    }
+
+    public static void registerHudMessage() {
+        OverlayRegistry.registerOverlayAbove(ForgeIngameGui.HOTBAR_ELEMENT, "Drift", driftHud);
     }
 
     @SubscribeEvent
@@ -69,12 +75,6 @@ public class ClientEventHandler {
                 }
             }
         }
-    }
-
-    private static DriftMessageHud driftHud = new DriftMessageHud();
-
-    public static void registerHudMessage() {
-        OverlayRegistry.registerOverlayAbove(ForgeIngameGui.HOTBAR_ELEMENT, "Drift", driftHud);
     }
 
     @SubscribeEvent
