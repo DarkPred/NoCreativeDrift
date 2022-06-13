@@ -1,6 +1,7 @@
 package com.github.darkpred.nocreativedrift.client;
 
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 
 /**
  * The strength categories with their multiplier
@@ -12,11 +13,11 @@ public enum Drift {
     DISABLED(0, "disabled");
 
     private final double multi;
-    private final TranslatableText text;
+    private final MutableText text;
 
     Drift(double multi, String name) {
         this.multi = multi;
-        text = new TranslatableText("hud.nocreativedrift.drift_strength_" + name);
+        text = Text.translatable("hud.nocreativedrift.drift_strength_" + name);
     }
 
     /**
@@ -33,7 +34,7 @@ public enum Drift {
      *
      * @return the {@code TranslatableText} of this category
      */
-    public TranslatableText getText() {
+    public MutableText getText() {
         return text;
     }
 }

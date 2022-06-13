@@ -8,7 +8,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
 
@@ -67,7 +68,7 @@ public class NoCreativeDriftClient implements ClientModInitializer {
                 MinecraftClient mc = MinecraftClient.getInstance();
                 float yPosition = (float) (0.3 * mc.getWindow().getScaledHeight());
                 int color = addOpacityToColor(opacity, "EEEBF0");
-                TranslatableText text = new TranslatableText("hud.nocreativedrift.drift_strength", getCurDrift().getText());
+                MutableText text = Text.translatable("hud.nocreativedrift.drift_strength", getCurDrift().getText());
                 mc.textRenderer.drawWithShadow(matrixStack, text, 2, yPosition, color);
             }
         });
@@ -84,7 +85,7 @@ public class NoCreativeDriftClient implements ClientModInitializer {
     private void stopHorizontalDrift(ClientPlayerEntity player) {
         MinecraftClient mc = MinecraftClient.getInstance();
         Vec3d velocity = player.getVelocity();
-        if (!(mc.options.keyForward.isPressed() || mc.options.keyBack.isPressed() || mc.options.keyLeft.isPressed() || mc.options.keyRight.isPressed())) {
+        if (!(mc.options.forwardKey.isPressed() || mc.options.backKey.isPressed() || mc.options.leftKey.isPressed() || mc.options.rightKey.isPressed())) {
             player.setVelocity(velocity.getX() * getCurDrift().getMulti(), velocity.getY(), velocity.getZ() * getCurDrift().getMulti());
         }
     }
@@ -98,17 +99,17 @@ public class NoCreativeDriftClient implements ClientModInitializer {
         //If no movement keys are pressed slow down player. Seems to work fine with pistons and stuff
         stopHorizontalDrift(player);
         if (ClientConfig.CONFIG.getOrDefault("disableVerticalDrift", false)) {
-            if (keyJumpPressed && !mc.options.keyJump.isPressed()) {
+            if (keyJumpPressed && !mc.options.jumpKey.isPressed()) {
                 //Multiplier only applied once but that's fine because there is barely no drift anyway
                 player.setVelocity(velocity.getX(), velocity.getY() * getCurDrift().getMulti(), velocity.getZ());
                 keyJumpPressed = false;
-            } else if (mc.options.keyJump.isPressed()) {
+            } else if (mc.options.jumpKey.isPressed()) {
                 keyJumpPressed = true;
             }
-            if (keySneakPressed && !mc.options.keySneak.isPressed()) {
+            if (keySneakPressed && !mc.options.sneakKey.isPressed()) {
                 player.setVelocity(velocity.getX(), velocity.getY() * getCurDrift().getMulti(), velocity.getZ());
                 keySneakPressed = false;
-            } else if (mc.options.keySneak.isPressed()) {
+            } else if (mc.options.sneakKey.isPressed()) {
                 keySneakPressed = true;
             }
         }
