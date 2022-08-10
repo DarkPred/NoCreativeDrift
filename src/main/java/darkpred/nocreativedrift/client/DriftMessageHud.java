@@ -8,20 +8,16 @@ import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.IIngameOverlay;
 
 public class DriftMessageHud implements IIngameOverlay {
-    protected float opacity = 5.0f;
 
     @Override
     public void render(ForgeIngameGui gui, PoseStack poseStack, float partialTick, int width, int height) {
-        if (ClientConfig.isRuleEnabled(ClientConfig.enableHudFading)) {
-            if (opacity <= 0) {
-                return;
-            }
-        }
+        if (!ClientConfig.isRuleEnabled(ClientConfig.enableHudMessage)) return;
+        if (ClientConfig.isRuleEnabled(ClientConfig.enableHudFading) && ClientEventHandler.hudOpacity <= 0) return;
         poseStack.pushPose();
         float yPosition = (float) (ClientConfig.hudOffset.get() * Minecraft.getInstance().getWindow().getGuiScaledHeight());
         TranslatableComponent text = new TranslatableComponent("hud.nocreativedrift.drift_strength",
                 ClientEventHandler.getCurDrift().getTextComponent());
-        int color = addOpacityToColor(opacity, "EEEBF0");
+        int color = addOpacityToColor(ClientEventHandler.hudOpacity, "EEEBF0");
         Minecraft.getInstance().font.drawShadow(poseStack, text, 2, yPosition, color);
         poseStack.popPose();
     }

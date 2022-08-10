@@ -18,6 +18,7 @@ import net.minecraftforge.network.NetworkConstants;
 @Mod(NoCreativeDrift.MOD_ID)
 public class NoCreativeDrift {
     public static final String MOD_ID = "nocreativedrift";
+    private static boolean simplyJetpacksLoaded = false;
     private static boolean ironJetpacksLoaded = false;
     private static boolean mekanismLoaded = false;
 
@@ -28,8 +29,13 @@ public class NoCreativeDrift {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
 
+        simplyJetpacksLoaded = ModList.get().getModFileById("simplyjetpacks") != null;
         ironJetpacksLoaded = ModList.get().getModFileById("ironjetpacks") != null;
         mekanismLoaded = ModList.get().getModFileById("mekanism") != null;
+    }
+
+    public static boolean isSimplyJetpacksLoaded() {
+        return simplyJetpacksLoaded;
     }
 
     public static boolean isIronJetpacksLoaded() {
@@ -41,12 +47,8 @@ public class NoCreativeDrift {
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
-        if (ClientConfig.isRuleEnabled(ClientConfig.enableToggleKeyBind)) {
-            ClientRegistry.registerKeyBinding(KeyBindList.toggleDrift);
-        }
-        if (ClientConfig.isRuleEnabled(ClientConfig.enableHudMessage)) {
-            ClientEventHandler.registerHudMessage();
-        }
+        ClientRegistry.registerKeyBinding(KeyBindList.toggleDrift);
+        ClientEventHandler.registerHudMessage();
         ClientEventHandler.setCurDrift(Drift.values()[ClientConfig.driftStrength.get()]);
     }
 }

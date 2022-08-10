@@ -88,9 +88,10 @@ repositories {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
+    compileOnly fg.deobf("curse.maven:simplyjetpacks-251792:3914653") //1.18.2-2.8.0.1
     compileOnly fg.deobf("curse.maven:ironjetpacks-284497:3686408") //1.18.2-5.1.0
     compileOnly fg.deobf("curse.maven:cucumber-272335:3686400") //1.18.2-5.1.0
-    compileOnly fg.deobf("curse.maven:mekanism-268560:3743835") //1.18.2-10.2.0.459
+    compileOnly fg.deobf("curse.maven:mekanism-268560:3875976") //1.18.2-10.2.5.459
 }
 jar {
     manifest {

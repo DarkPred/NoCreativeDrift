@@ -9,7 +9,6 @@ public class ClientConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.BooleanValue disableJetpackDrift;
-    public static final ForgeConfigSpec.BooleanValue enableToggleKeyBind;
     public static final ForgeConfigSpec.BooleanValue enableHudMessage;
     public static final ForgeConfigSpec.BooleanValue enableHudFading;
     public static final ForgeConfigSpec.DoubleValue hudOffset;
@@ -22,9 +21,6 @@ public class ClientConfig {
                 .comment("Disable the drift during vertical flight")
                 .define("disableVerticalDrift", false);
         BUILDER.push("keybinding");
-        enableToggleKeyBind = BUILDER
-                .comment("Enable a key bind that toggles drift in game")
-                .define("enableToggleKeyBind", false);
         enableHudMessage = BUILDER
                 .comment("Enable a hud message that displays the current drift strength", "I recommend this if enableToggleKeyBind is set to true")
                 .define("enableHudMessage", false);
