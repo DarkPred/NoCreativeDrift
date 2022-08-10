@@ -2,9 +2,7 @@ package darkpred.nocreativedrift;
 
 import darkpred.nocreativedrift.client.ClientEventHandler;
 import darkpred.nocreativedrift.client.Drift;
-import darkpred.nocreativedrift.client.KeyBindList;
 import darkpred.nocreativedrift.config.ClientConfig;
-import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModList;
@@ -27,7 +25,6 @@ public class NoCreativeDrift {
         MinecraftForge.EVENT_BUS.register(this);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
-
         ironJetpacksLoaded = ModList.get().getModFileById("ironjetpacks") != null;
         mekanismLoaded = ModList.get().getModFileById("mekanism") != null;
     }
@@ -41,12 +38,6 @@ public class NoCreativeDrift {
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
-        if (ClientConfig.isRuleEnabled(ClientConfig.enableToggleKeyBind)) {
-            ClientRegistry.registerKeyBinding(KeyBindList.toggleDrift);
-        }
-        if (ClientConfig.isRuleEnabled(ClientConfig.enableHudMessage)) {
-            ClientEventHandler.registerHudMessage();
-        }
         ClientEventHandler.setCurDrift(Drift.values()[ClientConfig.driftStrength.get()]);
     }
 }

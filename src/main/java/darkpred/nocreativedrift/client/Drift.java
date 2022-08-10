@@ -1,7 +1,7 @@
 package darkpred.nocreativedrift.client;
 
 import darkpred.nocreativedrift.NoCreativeDrift;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 /**
  * The strength categories with their multiplier
@@ -13,11 +13,11 @@ public enum Drift {
     DISABLED(0, "disabled");
 
     private final double multi;
-    private final TranslatableComponent textComponent;
+    private final Component textComponent;
 
     Drift(double multi, String name) {
         this.multi = multi;
-        textComponent = new TranslatableComponent("hud." + NoCreativeDrift.MOD_ID + ".drift_strength_" + name);
+        textComponent = Component.translatable("hud." + NoCreativeDrift.MOD_ID + ".drift_strength_" + name);
     }
 
     /**
@@ -34,7 +34,7 @@ public enum Drift {
      *
      * @return the {@code TranslatableComponent} of this category
      */
-    public TranslatableComponent getTextComponent() {
+    public Component getTextComponent() {
         return textComponent;
     }
 }
