@@ -7,7 +7,7 @@ import mekanism.common.item.gear.ItemJetpack;
 import mekanism.common.item.interfaces.IJetpackItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.server.IntegratedServer;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -59,8 +59,7 @@ public class ClientEventHandler {
                 stopDrift(event);
             }
             if (ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift)) {
-                ItemStack itemStack = event.player.getItemBySlot(EquipmentSlot.CHEST);
-                if (isIronJetpackOn(itemStack, event.player.isCreative()) || isMekanismJetpackOn(itemStack)) {
+                if (isIronJetpackOn(event.player) || isMekanismJetpackOn(event.player)) {
                     stopDrift(event);
                 }
             }
@@ -89,8 +88,7 @@ public class ClientEventHandler {
         }
         if ((ClientConfig.isRuleEnabled(ClientConfig.disableVerticalDrift))) {
             if ((ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift))) {
-                ItemStack itemStack = event.player.getItemBySlot(EquipmentSlot.CHEST);
-                if (isMekanismJetpackOn(itemStack) || isIronJetpackOn(itemStack, event.player.isCreative())) {
+                if (isMekanismJetpackOn(event.player) || isIronJetpackOn(event.player)) {
                     return;
                 }
             }
@@ -111,18 +109,22 @@ public class ClientEventHandler {
         }
     }
 
-    private static boolean isMekanismJetpackOn(ItemStack itemStack) {
-        if (NoCreativeDrift.isMekanismLoaded() && itemStack.getItem() instanceof IJetpackItem) {
-            IJetpackItem.JetpackMode mode = ((IJetpackItem) itemStack.getItem()).getJetpackMode(itemStack);
-            return mode == ItemJetpack.JetpackMode.NORMAL || mode == ItemJetpack.JetpackMode.HOVER;
+    private static boolean isMekanismJetpackOn(Player player) {
+        if (NoCreativeDrift.isMekanismLoaded()) {
+            ItemStack itemStack = IJetpackItem.getActiveJetpack(player);
+            if (!itemStack.isEmpty()) {
+                IJetpackItem.JetpackMode mode = ((IJetpackItem) itemStack.getItem()).getJetpackMode(itemStack);
+                return mode == ItemJetpack.JetpackMode.NORMAL || mode == ItemJetpack.JetpackMode.HOVER;
+            }
         }
         return false;
     }
 
-    private static boolean isIronJetpackOn(ItemStack itemStack, boolean isCreative) {
+    private static boolean isIronJetpackOn(Player player) {
         if (NoCreativeDrift.isIronJetpacksLoaded()) {
-            if (JetpackUtils.isEngineOn(itemStack)) {
-                return JetpackUtils.getEnergyStorage(itemStack).getEnergyStored() > 0 || isCreative;
+            ItemStack itemStack = JetpackUtils.getEquippedJetpack(player);
+            if (itemStack.getItem() instanceof com.blakebr0.ironjetpacks.item.JetpackItem) {
+                return JetpackUtils.isFlying(player);
             }
         }
         return false;
