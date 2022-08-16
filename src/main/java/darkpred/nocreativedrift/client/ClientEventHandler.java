@@ -7,7 +7,7 @@ import mekanism.common.item.gear.ItemJetpack;
 import mekanism.common.item.interfaces.IJetpackItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.server.IntegratedServer;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -21,6 +21,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import stormedpanda.simplyjetpacks.item.JetpackItem;
+import stormedpanda.simplyjetpacks.util.JetpackUtil;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -68,8 +69,7 @@ public class ClientEventHandler {
                 stopDrift(event);
             }
             if (ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift)) {
-                ItemStack itemStack = event.player.getItemBySlot(EquipmentSlot.CHEST);
-                if (isJetpackOn(itemStack, event.player.isCreative())) {
+                if (isJetpackOn(event.player)) {
                     stopDrift(event);
                 }
             }
@@ -98,8 +98,7 @@ public class ClientEventHandler {
         }
         if ((ClientConfig.isRuleEnabled(ClientConfig.disableVerticalDrift))) {
             if ((ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift))) {
-                ItemStack itemStack = event.player.getItemBySlot(EquipmentSlot.CHEST);
-                if (isJetpackOn(itemStack, event.player.isCreative())) {
+                if (isJetpackOn(event.player)) {
                     return;
                 }
             }
@@ -120,31 +119,36 @@ public class ClientEventHandler {
         }
     }
 
-    private static boolean isJetpackOn(ItemStack itemStack, boolean isCreative) {
-        return isMekanismJetpackOn(itemStack) || isIronJetpackOn(itemStack, isCreative) || isSimplyJetpackOn(itemStack, isCreative);
+    private static boolean isJetpackOn(Player player) {
+        return isMekanismJetpackOn(player) || isIronJetpackOn(player) || isSimplyJetpackOn(player);
     }
 
-    private static boolean isMekanismJetpackOn(ItemStack itemStack) {
-        if (NoCreativeDrift.isMekanismLoaded() && itemStack.getItem() instanceof IJetpackItem) {
-            IJetpackItem.JetpackMode mode = ((IJetpackItem) itemStack.getItem()).getJetpackMode(itemStack);
-            return mode == ItemJetpack.JetpackMode.NORMAL || mode == ItemJetpack.JetpackMode.HOVER;
-        }
-        return false;
-    }
-
-    private static boolean isIronJetpackOn(ItemStack itemStack, boolean isCreative) {
-        if (NoCreativeDrift.isIronJetpacksLoaded()) {
-            if (JetpackUtils.isEngineOn(itemStack)) {
-                return JetpackUtils.getEnergyStorage(itemStack).getEnergyStored() > 0 || isCreative;
+    private static boolean isMekanismJetpackOn(Player player) {
+        if (NoCreativeDrift.isMekanismLoaded()) {
+            ItemStack itemStack = IJetpackItem.getActiveJetpack(player);
+            if (!itemStack.isEmpty()) {
+                IJetpackItem.JetpackMode mode = ((IJetpackItem) itemStack.getItem()).getJetpackMode(itemStack);
+                return mode == ItemJetpack.JetpackMode.NORMAL || mode == ItemJetpack.JetpackMode.HOVER;
             }
         }
         return false;
     }
 
-    private static boolean isSimplyJetpackOn(ItemStack itemStack, boolean isCreative) {
+    private static boolean isIronJetpackOn(Player player) {
+        if (NoCreativeDrift.isIronJetpacksLoaded()) {
+            ItemStack itemStack = JetpackUtils.getEquippedJetpack(player);
+            if (itemStack.getItem() instanceof com.blakebr0.ironjetpacks.item.JetpackItem) {
+                return JetpackUtils.isFlying(player);
+            }
+        }
+        return false;
+    }
+
+    private static boolean isSimplyJetpackOn(Player player) {
         if (NoCreativeDrift.isSimplyJetpacksLoaded()) {
-            if (itemStack.getItem() instanceof JetpackItem && JetpackUtils.isEngineOn(itemStack)) {
-                return (itemStack.getTag() != null && itemStack.getTag().getInt("Energy") > 0) || isCreative;
+            ItemStack itemStack = JetpackUtil.getFromBothSlots(player);
+            if (itemStack.getItem() instanceof JetpackItem && ((JetpackItem) itemStack.getItem()).isEngineOn(itemStack)) {
+                return (itemStack.getTag() != null && itemStack.getTag().getInt("Energy") > 0) || player.isCreative();
             }
         }
         return false;
