@@ -63,7 +63,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', 'nocreativedrift', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
                 examplemod {
@@ -92,6 +92,7 @@ dependencies {
     compileOnly fg.deobf("curse.maven:ironjetpacks-284497:3908627") //1.18.2-5.1.4
     compileOnly fg.deobf("curse.maven:cucumber-272335:3859559") //1.18.2-5.1.2
     compileOnly fg.deobf("curse.maven:mekanism-268560:3875976") //1.18.2-10.2.5.459
+    compileOnly fg.deobf("curse.maven:controllable-317269:3936914") //1.18.2-0.16.5
 }
 jar {
     manifest {

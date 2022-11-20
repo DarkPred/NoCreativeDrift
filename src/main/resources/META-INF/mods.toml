@@ -45,3 +45,9 @@ mandatory=false
 versionRange="[1.18.2-2.8.0.1, 1.19)"
 ordering="AFTER"
 side="BOTH"
+[[dependencies.nocreativedrift]]
+modId="controllable"
+mandatory=false
+versionRange="[0.16.0, 0.17.0)"
+ordering="AFTER"
+side="BOTH"
