@@ -1,6 +1,9 @@
 package darkpred.nocreativedrift.client;
 
 import com.blakebr0.ironjetpacks.util.JetpackUtils;
+import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.ButtonBindings;
+import com.mrcrayfish.controllable.client.Controller;
 import darkpred.nocreativedrift.NoCreativeDrift;
 import darkpred.nocreativedrift.config.ClientConfig;
 import mekanism.common.item.gear.ItemJetpack;
@@ -82,7 +85,7 @@ public class ClientEventHandler {
         Minecraft mc = Minecraft.getInstance();
         Vec3 motion = event.player.getDeltaMovement();
         //If no movement keys are pressed slow down player. Seems to work fine with pistons and stuff
-        if (!(mc.options.keyUp.isDown() || mc.options.keyDown.isDown() || mc.options.keyLeft.isDown() || mc.options.keyRight.isDown())) {
+        if (!horizontalControlsUsed()) {
             // Sets the players horizontal motion to current * drift multiplier
             event.player.setDeltaMovement(motion.x() * getCurDrift().getMulti(), motion.y(), motion.z() * getCurDrift().getMulti());
         }
@@ -93,20 +96,58 @@ public class ClientEventHandler {
                 }
             }
 
-            if (keyJumpPressed && !mc.options.keyJump.isDown()) {
+            if (keyJumpPressed && !isJumpPressed()) {
                 //Multiplier only applied once but that's fine because there is barely no drift anyway
                 event.player.setDeltaMovement(motion.x(), motion.y() * getCurDrift().getMulti(), motion.z());
                 keyJumpPressed = false;
-            } else if (mc.options.keyJump.isDown()) {
+            } else if (isJumpPressed()) {
                 keyJumpPressed = true;
             }
-            if (keySneakPressed && !mc.options.keyShift.isDown()) {
+            if (keySneakPressed && !isSneakPressed()) {
                 event.player.setDeltaMovement(motion.x(), motion.y() * getCurDrift().getMulti(), motion.z());
                 keySneakPressed = false;
-            } else if (mc.options.keyShift.isDown()) {
+            } else if (isSneakPressed()) {
                 keySneakPressed = true;
             }
         }
+    }
+    private static boolean isJumpPressed() {
+        boolean pressed = false;
+        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.enableControllerSupport)) {
+            pressed = ButtonBindings.JUMP.isButtonDown();
+        }
+
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.keyJump.isDown()) {
+            pressed = true;
+        }
+        return pressed;
+    }
+    private static boolean isSneakPressed() {
+        boolean pressed = false;
+        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.enableControllerSupport)) {
+            pressed = ButtonBindings.SNEAK.isButtonDown();
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.keyShift.isDown()) {
+            pressed = true;
+        }
+        return pressed;
+    }
+    private static boolean horizontalControlsUsed() {
+        boolean pressed = false;
+        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.enableControllerSupport)) {
+            Controller controller = Controllable.getController();
+            if (controller != null) {
+                float deadZone = com.mrcrayfish.controllable.Config.CLIENT.options.deadZone.get().floatValue();
+                pressed = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
+            }
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.keyUp.isDown() || mc.options.keyDown.isDown() || mc.options.keyLeft.isDown() || mc.options.keyRight.isDown()) {
+            pressed = true;
+        }
+        return pressed;
     }
 
     private static boolean isMekanismJetpackOn(Player player) {
