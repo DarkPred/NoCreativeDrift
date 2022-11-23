@@ -6,6 +6,7 @@ import darkpred.nocreativedrift.config.ClientConfig;
 import mekanism.common.CommonPlayerTickHandler;
 import mekanism.common.item.gear.ItemJetpack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -35,8 +36,9 @@ public class ClientEventHandler {
     private static boolean keyJumpPressed = false;
     private static boolean keySneakPressed = false;
     private static boolean keyToggleDriftPressed = false;
-    private static float opacity = 5.0f;
     private static boolean dirty;
+
+    public static float hudOpacity = 5.0f;
 
     static {
         DRIFT_QUEUE.add(Drift.VANILLA);
@@ -48,17 +50,15 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void onWorldTickEvent(WorldEvent.Save event) {
         IntegratedServer mcs = Minecraft.getInstance().getIntegratedServer();
-        if (mcs != null) {
-            if (dirty) {
-                ClientConfig.driftStrength.set(DRIFT_QUEUE.peek().ordinal());
-                dirty = false;
-            }
+        if (mcs != null && dirty) {
+            ClientConfig.driftStrength.set(DRIFT_QUEUE.peek().ordinal());
+            dirty = false;
         }
     }
 
     @SubscribeEvent
     public static void onPlayerTickEvent(PlayerTickEvent event) {
-        opacity = Math.max(opacity - 0.05f, 0);
+        hudOpacity = Math.max(hudOpacity - 0.05f, 0);
         //Ensures that the code is only run once on the logical client
         if (event.phase == Phase.END && event.side == LogicalSide.CLIENT) {
             // Making sure that the player is creative flying
@@ -66,8 +66,7 @@ public class ClientEventHandler {
                 stopDrift(event);
             }
             if (ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift)) {
-                ItemStack itemStack = event.player.getItemStackFromSlot(EquipmentSlotType.CHEST);
-                if (isSimplyJetpackOn(itemStack) || isIronJetpackOn(itemStack) || isMekanismJetpackOn(itemStack)) {
+                if (isJetpackOn(event.player)) {
                     stopDrift(event);
                 }
             }
@@ -79,7 +78,7 @@ public class ClientEventHandler {
         if (keyToggleDriftPressed != KeyBindList.toggleDrift.isKeyDown()) {
             if (!keyToggleDriftPressed) {
                 DRIFT_QUEUE.add(DRIFT_QUEUE.pop());
-                opacity = 5.0f;
+                hudOpacity = 5.0f;
                 dirty = true;
             }
             keyToggleDriftPressed = KeyBindList.toggleDrift.isKeyDown();
@@ -89,7 +88,7 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void renderOverlay(RenderGameOverlayEvent.Post event) {
         if (ClientConfig.isRuleEnabled(ClientConfig.enableHudFading)) {
-            if (opacity <= 0) {
+            if (hudOpacity <= 0) {
                 return;
             }
         }
@@ -98,7 +97,7 @@ public class ClientEventHandler {
             matrix.push();
             float yPosition = (float) (ClientConfig.hudOffset.get() * event.getWindow().getScaledHeight());
             TranslationTextComponent text = new TranslationTextComponent("hud.nocreativedrift.drift_strength", getCurDrift().getTextComponent());
-            int color = addOpacityToColor(opacity, "EEEBF0");
+            int color = addOpacityToColor(hudOpacity, "EEEBF0");
             Minecraft.getInstance().fontRenderer.func_243246_a(matrix, text, 2, yPosition, color);
             matrix.pop();
         }
@@ -126,8 +125,7 @@ public class ClientEventHandler {
         }
         if ((ClientConfig.isRuleEnabled(ClientConfig.disableVerticalDrift))) {
             if ((ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift))) {
-                ItemStack itemStack = event.player.getItemStackFromSlot(EquipmentSlotType.CHEST);
-                if (isMekanismJetpackOn(itemStack) || isIronJetpackOn(itemStack) || isSimplyJetpackOn(itemStack)) {
+                if (isJetpackOn(event.player)) {
                     return;
                 }
             }
@@ -148,16 +146,22 @@ public class ClientEventHandler {
         }
     }
 
-    private static boolean isMekanismJetpackOn(ItemStack itemStack) {
+    private static boolean isJetpackOn(PlayerEntity player) {
+        return isMekanismJetpackOn(player) || isIronJetpackOn(player) || isSimplyJetpackOn(player);
+    }
+
+    private static boolean isMekanismJetpackOn(PlayerEntity player) {
         if (NoCreativeDrift.isMekanismLoaded()) {
+            ItemStack itemStack = player.getItemStackFromSlot(EquipmentSlotType.CHEST);
             ItemJetpack.JetpackMode mode = CommonPlayerTickHandler.getJetpackMode(itemStack);
             return mode == ItemJetpack.JetpackMode.NORMAL || mode == ItemJetpack.JetpackMode.HOVER;
         }
         return false;
     }
 
-    private static boolean isIronJetpackOn(ItemStack itemStack) {
+    private static boolean isIronJetpackOn(PlayerEntity player) {
         if (NoCreativeDrift.isIronJetpacksLoaded()) {
+            ItemStack itemStack = player.getItemStackFromSlot(EquipmentSlotType.CHEST);
             if (itemStack.getItem() instanceof com.blakebr0.ironjetpacks.item.JetpackItem && isEngineOn(itemStack)) {
                 return itemStack.getCapability(CapabilityEnergy.ENERGY).orElse(EMPTY_ENERGY_STORAGE).getEnergyStored() > 0;
             }
@@ -165,8 +169,9 @@ public class ClientEventHandler {
         return false;
     }
 
-    private static boolean isSimplyJetpackOn(ItemStack itemStack) {
+    private static boolean isSimplyJetpackOn(PlayerEntity player) {
         if (NoCreativeDrift.isSimplyJetpacksLoaded()) {
+            ItemStack itemStack = player.getItemStackFromSlot(EquipmentSlotType.CHEST);
             if (itemStack.getItem() instanceof JetpackItem && isEngineOn(itemStack)) {
                 return itemStack.getTag() != null && itemStack.getTag().getInt("Energy") > 0;
             }
