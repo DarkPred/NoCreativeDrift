@@ -45,3 +45,9 @@ Stops the player from drifting after they stop flying.
     versionRange = "[10.0.16.442, 11)"
     ordering = "AFTER"
     side = "BOTH"
+[[dependencies.nocreativedrift]]
+    modId = "controllable"
+    mandatory = false
+    versionRange = "[0.16.0, 0.17.0)"
+    ordering = "AFTER"
+    side = "BOTH"

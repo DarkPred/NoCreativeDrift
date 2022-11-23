@@ -22,6 +22,7 @@ public class NoCreativeDrift {
     private static boolean simplyJetpacksLoaded = false;
     private static boolean ironJetpacksLoaded = false;
     private static boolean mekanismLoaded = false;
+    private static boolean controllableLoaded = false;
 
     public NoCreativeDrift() {
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST,
@@ -33,6 +34,7 @@ public class NoCreativeDrift {
         simplyJetpacksLoaded = ModList.get().getModFileById("simplyjetpacks") != null;
         ironJetpacksLoaded = ModList.get().getModFileById("ironjetpacks") != null;
         mekanismLoaded = ModList.get().getModFileById("mekanism") != null;
+        controllableLoaded = ModList.get().getModFileById("controllable") != null;
     }
 
     public static boolean isSimplyJetpacksLoaded() {
@@ -45,6 +47,10 @@ public class NoCreativeDrift {
 
     public static boolean isMekanismLoaded() {
         return mekanismLoaded;
+    }
+
+    public static boolean isControllableLoaded() {
+        return controllableLoaded;
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {

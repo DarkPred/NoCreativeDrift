@@ -1,6 +1,9 @@
 package darkpred.nocreativedrift.client;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.ButtonBindings;
+import com.mrcrayfish.controllable.client.Controller;
 import darkpred.nocreativedrift.NoCreativeDrift;
 import darkpred.nocreativedrift.config.ClientConfig;
 import mekanism.common.CommonPlayerTickHandler;
@@ -119,7 +122,7 @@ public class ClientEventHandler {
         Minecraft mc = Minecraft.getInstance();
         Vector3d motion = event.player.getMotion();
         //If no movement keys are pressed slow down player. Seems to work fine with pistons and stuff
-        if (!(mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown())) {
+        if (!horizontalControlsUsed()) {
             // Sets the players horizontal motion to current * drift multiplier
             event.player.setMotion(motion.getX() * getCurDrift().getMulti(), motion.getY(), motion.getZ() * getCurDrift().getMulti());
         }
@@ -130,20 +133,59 @@ public class ClientEventHandler {
                 }
             }
 
-            if (keyJumpPressed && !mc.gameSettings.keyBindJump.isKeyDown()) {
+            if (keyJumpPressed && !isJumpPressed()) {
                 //Multiplier only applied once but that's fine because there is barely no drift anyway
                 event.player.setMotion(motion.getX(), motion.getY() * getCurDrift().getMulti(), motion.getZ());
                 keyJumpPressed = false;
-            } else if (mc.gameSettings.keyBindJump.isKeyDown()) {
+            } else if (isJumpPressed()) {
                 keyJumpPressed = true;
             }
-            if (keySneakPressed && !mc.gameSettings.keyBindSneak.isKeyDown()) {
+            if (keySneakPressed && !isSneakPressed()) {
                 event.player.setMotion(motion.getX(), motion.getY() * getCurDrift().getMulti(), motion.getZ());
                 keySneakPressed = false;
-            } else if (mc.gameSettings.keyBindSneak.isKeyDown()) {
+            } else if (isSneakPressed()) {
                 keySneakPressed = true;
             }
         }
+    }
+
+    private static boolean isJumpPressed() {
+        boolean pressed = false;
+        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.enableControllerSupport)) {
+            pressed = ButtonBindings.JUMP.isButtonDown();
+        }
+
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.gameSettings.keyBindJump.isKeyDown()) {
+            pressed = true;
+        }
+        return pressed;
+    }
+    private static boolean isSneakPressed() {
+        boolean pressed = false;
+        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.enableControllerSupport)) {
+            pressed = ButtonBindings.SNEAK.isButtonDown();
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.gameSettings.keyBindSneak.isKeyDown()) {
+            pressed = true;
+        }
+        return pressed;
+    }
+    private static boolean horizontalControlsUsed() {
+        boolean pressed = false;
+        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.enableControllerSupport)) {
+            Controller controller = Controllable.getController();
+            if (controller != null) {
+                float deadZone = com.mrcrayfish.controllable.Config.CLIENT.options.deadZone.get().floatValue();
+                pressed = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
+            }
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown()) {
+            pressed = true;
+        }
+        return pressed;
     }
 
     private static boolean isJetpackOn(PlayerEntity player) {

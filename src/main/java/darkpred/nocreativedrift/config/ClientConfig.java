@@ -16,6 +16,7 @@ public class ClientConfig {
     public static final ForgeConfigSpec.BooleanValue disableNonCreativeDrift;
     public static final ForgeConfigSpec.BooleanValue disableVerticalDrift;
     public static final ForgeConfigSpec.IntValue driftStrength;
+    public static final ForgeConfigSpec.BooleanValue enableControllerSupport;
 
     static {
         disableVerticalDrift = BUILDER
@@ -47,6 +48,9 @@ public class ClientConfig {
         driftStrength = BUILDER
                 .comment("The current drift strength. {Vanilla:0, Strong:1, Weak:2, Disabled:3}")
                 .defineInRange("driftStrength", 3, 0, 3);
+        enableControllerSupport = BUILDER
+                .comment("Enable support for controller movement. Requires the Controllable Mod")
+                .define("enableControllerSupport", true);
         BUILDER.pop();
 
         SPEC = BUILDER.build();
