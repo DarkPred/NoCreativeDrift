@@ -34,7 +34,6 @@ public class ClientEventHandler {
     private static boolean keyJumpPressed ;
     private static boolean keySneakPressed;
     private static boolean keyToggleDriftPressed;
-    private static boolean dirty;
 
     protected static float hudOpacity = 5.0f;
 
@@ -47,15 +46,6 @@ public class ClientEventHandler {
 
     public static void registerHudMessage() {
         OverlayRegistry.registerOverlayAbove(ForgeIngameGui.HOTBAR_ELEMENT, "Drift", driftHud);
-    }
-
-    @SubscribeEvent
-    public static void onWorldTickEvent(WorldEvent.Save event) {
-        IntegratedServer mcs = Minecraft.getInstance().getSingleplayerServer();
-        if (mcs != null && dirty) {
-            ClientConfig.driftStrength.set(DRIFT_QUEUE.peek().ordinal());
-            dirty = false;
-        }
     }
 
     @SubscribeEvent
@@ -82,7 +72,7 @@ public class ClientEventHandler {
             if (!keyToggleDriftPressed) {
                 DRIFT_QUEUE.add(DRIFT_QUEUE.pop());
                 hudOpacity = 5.0f;
-                dirty = true;
+                ClientConfig.DRIFT_STRENGTH.set(DRIFT_QUEUE.peek().ordinal());
             }
             keyToggleDriftPressed = KeyBindList.TOGGLE_DRIFT.isDown();
         }
