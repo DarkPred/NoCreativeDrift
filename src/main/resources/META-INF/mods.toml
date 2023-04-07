@@ -5,7 +5,7 @@ issueTrackerURL="https://github.com/DarkPred/NoCreativeDrift/issues"
 
 [[mods]]
 modId="nocreativedrift"
-version="${version}"
+version="${file.jarVersion}"
 displayName="NoCreativeDrift"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nocreativedrift"
 logoFile="logo.png"
