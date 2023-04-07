@@ -17,6 +17,6 @@ public class ClientRegistration {
 
     @SubscribeEvent
     public static void onRegisterKeyMappingsEvent(RegisterKeyMappingsEvent event) {
-        event.register(KeyBindList.toggleDrift);
+        event.register(KeyBindList.TOGGLE_DRIFT);
     }
 }

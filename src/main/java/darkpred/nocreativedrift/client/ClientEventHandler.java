@@ -6,10 +6,8 @@ import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
 import darkpred.nocreativedrift.NoCreativeDrift;
 import darkpred.nocreativedrift.config.ClientConfig;
-import mekanism.common.item.gear.ItemJetpack;
 import mekanism.common.item.interfaces.IJetpackItem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -17,7 +15,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
@@ -28,12 +25,12 @@ import java.util.Deque;
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class ClientEventHandler {
     private static final Deque<Drift> DRIFT_QUEUE = new ArrayDeque<>();
-    private static boolean keyJumpPressed = false;
-    private static boolean keySneakPressed = false;
-    private static boolean keyToggleDriftPressed = false;
+    private static boolean keyJumpPressed;
+    private static boolean keySneakPressed;
+    private static boolean keyToggleDriftPressed;
     private static boolean dirty;
 
-    public static float hudOpacity = 5.0f;
+    protected static float hudOpacity = 5.0f;
 
     static {
         DRIFT_QUEUE.add(Drift.VANILLA);
@@ -58,10 +55,10 @@ public class ClientEventHandler {
         if (event.phase == Phase.END && event.side == LogicalSide.CLIENT) {
             // Making sure that the player is creative flying
             if ((ClientConfig.isRuleEnabled(
-                    ClientConfig.disableNonCreativeDrift) || event.player.isCreative()) && event.player.getAbilities().flying) {
+                    ClientConfig.DISABLE_NON_CREATIVE_DRIFT) || event.player.isCreative()) && event.player.getAbilities().flying) {
                 stopDrift(event);
             }
-            if (ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift)) {
+            if (ClientConfig.isRuleEnabled(ClientConfig.DISABLE_JETPACK_DRIFT)) {
                 if (isIronJetpackOn(event.player) || isMekanismJetpackOn(event.player)) {
                     stopDrift(event);
                 }
@@ -71,49 +68,48 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onKeyInputEvent(InputEvent.Key event) {
-        if (keyToggleDriftPressed != KeyBindList.toggleDrift.isDown()) {
+        if (keyToggleDriftPressed != KeyBindList.TOGGLE_DRIFT.isDown()) {
             if (!keyToggleDriftPressed) {
                 DRIFT_QUEUE.add(DRIFT_QUEUE.pop());
                 hudOpacity = 5.0f;
                 dirty = true;
             }
-            keyToggleDriftPressed = KeyBindList.toggleDrift.isDown();
+            keyToggleDriftPressed = KeyBindList.TOGGLE_DRIFT.isDown();
         }
     }
 
     private static void stopDrift(PlayerTickEvent event) {
-        Minecraft mc = Minecraft.getInstance();
         Vec3 motion = event.player.getDeltaMovement();
         //If no movement keys are pressed slow down player. Seems to work fine with pistons and stuff
         if (!horizontalControlsUsed()) {
             // Sets the players horizontal motion to current * drift multiplier
             event.player.setDeltaMovement(motion.x() * getCurDrift().getMulti(), motion.y(), motion.z() * getCurDrift().getMulti());
         }
-        if ((ClientConfig.isRuleEnabled(ClientConfig.disableVerticalDrift))) {
-            if ((ClientConfig.isRuleEnabled(ClientConfig.disableJetpackDrift))) {
-                if (isMekanismJetpackOn(event.player) || isIronJetpackOn(event.player)) {
-                    return;
-                }
-            }
+        if (!ClientConfig.isRuleEnabled(ClientConfig.DISABLE_VERTICAL_DRIFT)) {
+            return;
+        }
+        if (ClientConfig.isRuleEnabled(ClientConfig.DISABLE_JETPACK_DRIFT) && (isMekanismJetpackOn(event.player) || isIronJetpackOn(event.player))) {
+            return;
+        }
 
-            if (keyJumpPressed && !isJumpPressed()) {
-                //Multiplier only applied once but that's fine because there is barely no drift anyway
-                event.player.setDeltaMovement(motion.x(), motion.y() * getCurDrift().getMulti(), motion.z());
-                keyJumpPressed = false;
-            } else if (isJumpPressed()) {
-                keyJumpPressed = true;
-            }
-            if (keySneakPressed && !isSneakPressed()) {
-                event.player.setDeltaMovement(motion.x(), motion.y() * getCurDrift().getMulti(), motion.z());
-                keySneakPressed = false;
-            } else if (isSneakPressed()) {
-                keySneakPressed = true;
-            }
+        if (keyJumpPressed && !isJumpPressed()) {
+            //Multiplier only applied once but that's fine because there is barely no drift anyway
+            event.player.setDeltaMovement(motion.x(), motion.y() * getCurDrift().getMulti(), motion.z());
+            keyJumpPressed = false;
+        } else if (isJumpPressed()) {
+            keyJumpPressed = true;
+        }
+        if (keySneakPressed && !isSneakPressed()) {
+            event.player.setDeltaMovement(motion.x(), motion.y() * getCurDrift().getMulti(), motion.z());
+            keySneakPressed = false;
+        } else if (isSneakPressed()) {
+            keySneakPressed = true;
         }
     }
+
     private static boolean isJumpPressed() {
         boolean pressed = false;
-        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.enableControllerSupport)) {
+        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.ENABLE_CONTROLLER_SUPPORT)) {
             pressed = ButtonBindings.JUMP.isButtonDown();
         }
 
@@ -123,9 +119,10 @@ public class ClientEventHandler {
         }
         return pressed;
     }
+
     private static boolean isSneakPressed() {
         boolean pressed = false;
-        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.enableControllerSupport)) {
+        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.ENABLE_CONTROLLER_SUPPORT)) {
             pressed = ButtonBindings.SNEAK.isButtonDown();
         }
         Minecraft mc = Minecraft.getInstance();
@@ -134,9 +131,10 @@ public class ClientEventHandler {
         }
         return pressed;
     }
+
     private static boolean horizontalControlsUsed() {
         boolean pressed = false;
-        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.enableControllerSupport)) {
+        if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.ENABLE_CONTROLLER_SUPPORT)) {
             Controller controller = Controllable.getController();
             if (controller != null) {
                 float deadZone = com.mrcrayfish.controllable.Config.CLIENT.options.deadZone.get().floatValue();
@@ -155,7 +153,7 @@ public class ClientEventHandler {
             ItemStack itemStack = IJetpackItem.getActiveJetpack(player);
             if (!itemStack.isEmpty()) {
                 IJetpackItem.JetpackMode mode = ((IJetpackItem) itemStack.getItem()).getJetpackMode(itemStack);
-                return mode == ItemJetpack.JetpackMode.NORMAL || mode == ItemJetpack.JetpackMode.HOVER;
+                return mode == IJetpackItem.JetpackMode.NORMAL || mode == IJetpackItem.JetpackMode.HOVER;
             }
         }
         return false;
