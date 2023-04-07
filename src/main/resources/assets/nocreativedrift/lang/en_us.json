@@ -1,5 +1,6 @@
 {
   "key.nocreativedrift.toggle_drift": "Toggle drift",
+  "key.nocreativedrift.category": "No Creative Drift",
   "hud.nocreativedrift.drift_strength": "Drift: %s",
   "hud.nocreativedrift.drift_strength_vanilla": "Vanilla",
   "hud.nocreativedrift.drift_strength_strong": "Strong",

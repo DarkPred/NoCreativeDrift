@@ -13,15 +13,14 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.NetworkConstants;
 
 @Mod(NoCreativeDrift.MOD_ID)
 public class NoCreativeDrift {
     public static final String MOD_ID = "nocreativedrift";
-    private static boolean simplyJetpacksLoaded = false;
-    private static boolean ironJetpacksLoaded = false;
-    private static boolean mekanismLoaded = false;
-    private static boolean controllableLoaded = false;
+    private static boolean simplyJetpacksLoaded;
+    private static boolean ironJetpacksLoaded;
+    private static boolean mekanismLoaded;
+    private static boolean controllableLoaded;
 
     public NoCreativeDrift() {
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
@@ -52,8 +51,8 @@ public class NoCreativeDrift {
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
-        ClientRegistry.registerKeyBinding(KeyBindList.toggleDrift);
+        ClientRegistry.registerKeyBinding(KeyBindList.TOGGLE_DRIFT);
         ClientEventHandler.registerHudMessage();
-        ClientEventHandler.setCurDrift(Drift.values()[ClientConfig.driftStrength.get()]);
+        ClientEventHandler.setCurDrift(Drift.values()[ClientConfig.DRIFT_STRENGTH.get()]);
     }
 }

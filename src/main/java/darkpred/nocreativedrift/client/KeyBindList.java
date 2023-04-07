@@ -9,7 +9,7 @@ import net.minecraftforge.client.settings.KeyConflictContext;
 
 public class KeyBindList {
 
-    public static final KeyMapping toggleDrift = new KeyMapping(
+    public static final KeyMapping TOGGLE_DRIFT = new KeyMapping(
             Util.makeDescriptionId("key", new ResourceLocation(NoCreativeDrift.MOD_ID, "toggle_drift")),
-            KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, InputConstants.KEY_C, "No Creative Drift");
+            KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, InputConstants.KEY_C, "key.nocreativedrift.category");
 }
