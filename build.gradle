@@ -8,7 +8,7 @@ plugins {
 }
 version = minecraft_version + "-" + mod_version
 group = 'com.github.darkpred.nocreativedrift' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = mod_name
+archivesBaseName = "${mod_name}-forge"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -28,7 +28,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                nocreativedrift {
                     source sourceSets.main
                 }
             }
@@ -41,7 +41,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                nocreativedrift {
                     source sourceSets.main
                 }
             }
@@ -57,17 +57,11 @@ minecraft {
             args '--mod', 'nocreativedrift', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
-                examplemod {
+                nocreativedrift {
                     source sourceSets.main
                 }
             }
         }
-    }
-}
-
-processResources {
-    filesMatching("META-INF/mods.toml") {
-        expand 'version':mod_version
     }
 }
 
