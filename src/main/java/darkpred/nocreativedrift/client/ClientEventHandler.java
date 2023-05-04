@@ -6,8 +6,11 @@ import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
 import darkpred.nocreativedrift.NoCreativeDrift;
 import darkpred.nocreativedrift.config.ClientConfig;
+import me.pieking1215.invmove.InvMove;
 import mekanism.common.item.interfaces.IJetpackItem;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -49,7 +52,7 @@ public class ClientEventHandler {
                 stopDrift(event);
             }
             if (ClientConfig.isRuleEnabled(ClientConfig.DISABLE_JETPACK_DRIFT)) {
-                if (isIronJetpackOn(event.player) || isMekanismJetpackOn(event.player)) {
+                if (isJetpackOn(event.player)) {
                     stopDrift(event);
                 }
             }
@@ -78,12 +81,12 @@ public class ClientEventHandler {
         if (!ClientConfig.isRuleEnabled(ClientConfig.DISABLE_VERTICAL_DRIFT)) {
             return;
         }
-        if (ClientConfig.isRuleEnabled(ClientConfig.DISABLE_JETPACK_DRIFT) && (isMekanismJetpackOn(event.player) || isIronJetpackOn(event.player))) {
+        if (ClientConfig.isRuleEnabled(ClientConfig.DISABLE_JETPACK_DRIFT) && isJetpackOn(event.player)) {
             return;
         }
 
         if (keyJumpPressed && !isJumpPressed()) {
-            //Multiplier only applied once but that's fine because there is barely no drift anyway
+            //Multiplier only applied once but that's fine because there is barely any drift anyway
             event.player.setDeltaMovement(motion.x(), motion.y() * getCurDrift().getMulti(), motion.z());
             keyJumpPressed = false;
         } else if (isJumpPressed()) {
@@ -103,8 +106,8 @@ public class ClientEventHandler {
             pressed = ButtonBindings.JUMP.isButtonDown();
         }
 
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.options.keyJump.isDown()) {
+        Options opt = Minecraft.getInstance().options;
+        if (isKeyDown(opt.keyJump)) {
             pressed = true;
         }
         return pressed;
@@ -115,8 +118,8 @@ public class ClientEventHandler {
         if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.ENABLE_CONTROLLER_SUPPORT)) {
             pressed = ButtonBindings.SNEAK.isButtonDown();
         }
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.options.keyShift.isDown()) {
+        Options opt = Minecraft.getInstance().options;
+        if (isKeyDown(opt.keyShift)) {
             pressed = true;
         }
         return pressed;
@@ -131,11 +134,23 @@ public class ClientEventHandler {
                 pressed = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
             }
         }
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.options.keyUp.isDown() || mc.options.keyDown.isDown() || mc.options.keyLeft.isDown() || mc.options.keyRight.isDown()) {
+        Options opt = Minecraft.getInstance().options;
+        if (isKeyDown(opt.keyUp) || isKeyDown(opt.keyDown) || isKeyDown(opt.keyLeft) || isKeyDown(opt.keyRight)) {
             pressed = true;
         }
         return pressed;
+    }
+
+    private static boolean isKeyDown(KeyMapping key) {
+        if (NoCreativeDrift.isInvMoveLoaded()) {
+            return InvMove.rawIsKeyDown(key);
+        } else {
+            return key.isDown();
+        }
+    }
+
+    public static boolean isJetpackOn(Player player) {
+        return isMekanismJetpackOn(player) || isIronJetpackOn(player);
     }
 
     private static boolean isMekanismJetpackOn(Player player) {

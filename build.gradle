@@ -2,6 +2,7 @@ plugins {
     id 'eclipse'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
 }
 plugins {
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
@@ -69,6 +70,7 @@ repositories {
     maven {
         url "https://www.cursemaven.com"
     }
+    maven { url "https://maven.shedaniel.me/" }
 }
 
 dependencies {
@@ -76,7 +78,9 @@ dependencies {
     compileOnly fg.deobf("curse.maven:ironjetpacks-284497:3910467") //1.19.1-6.0.0
     compileOnly fg.deobf("curse.maven:cucumber-272335:3910374") //1.19.1-6.0.0
     compileOnly fg.deobf("curse.maven:mekanism-268560:3922056") //1.19.2-10.3.2.469
-    compileOnly fg.deobf("curse.maven:controllable-317269:3936915") //1.19.2-0.16.5
+    compileOnly fg.deobf("curse.maven:controllable-317269:3936915") //1.19.2-0.16.
+    implementation fg.deobf("curse.maven:invmove-581854:4346455") //1.19.3-0.8.2
+    runtimeOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:8.2.88") //dep for invmove
 }
 jar {
     manifest {
