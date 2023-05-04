@@ -7,6 +7,7 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7.+'
         classpath 'org.parchmentmc:librarian:1.+'
     }
 }
@@ -17,6 +18,7 @@ plugins {
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'org.spongepowered.mixin'
 
 version = minecraft_version + "-" + mod_version
 group = 'com.github.darkpred.nocreativedrift' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -81,15 +83,19 @@ repositories {
     maven {
         url "https://www.cursemaven.com"
     }
+    maven { url = "https://maven.shedaniel.me/" }
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly fg.deobf("curse.maven:simplyjetpacks-251792:3914653") //1.18.2-2.8.0.1
     compileOnly fg.deobf("curse.maven:ironjetpacks-284497:3908627") //1.18.2-5.1.4
     compileOnly fg.deobf("curse.maven:cucumber-272335:3859559") //1.18.2-5.1.2
     compileOnly fg.deobf("curse.maven:mekanism-268560:3875976") //1.18.2-10.2.5.459
     compileOnly fg.deobf("curse.maven:controllable-317269:3936914") //1.18.2-0.16.5
+    compileOnly fg.deobf("curse.maven:invmove-581854:4346452") //1.18.2-0.8.2
+    //runtimeOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:6.4.90") //dep for invmove
 }
 jar {
     manifest {
