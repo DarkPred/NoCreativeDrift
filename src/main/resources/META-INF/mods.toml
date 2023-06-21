@@ -1,12 +1,12 @@
 modLoader="javafml"
-loaderVersion="[41,)"
+loaderVersion="[47,)"
 license="GNU General Public License v3.0"
 issueTrackerURL="https://github.com/DarkPred/NoCreativeDrift/issues"
 
 [[mods]]
 modId="nocreativedrift"
-version="${file.jarVersion}"
-displayName="NoCreativeDrift"
+version="${mod_version}"
+displayName="${mod_name}"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nocreativedrift"
 logoFile="logo.png"
 authors="DarkPred"
@@ -16,33 +16,21 @@ Stops the player from drifting after they stop flying.
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.nocreativedrift]]
-modId="forge"
-mandatory=true
-versionRange="[41,)"
-ordering="NONE"
-side="BOTH"
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.nocreativedrift]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20,1.21)"
+    ordering="NONE"
+    side="BOTH"
 
 [[dependencies.nocreativedrift]]
-modId="minecraft"
-mandatory=true
-versionRange="[1.19,1.20)"
-ordering="NONE"
-side="BOTH"
-[[dependencies.nocreativedrift]]
-modId="ironjetpacks"
-mandatory=false
-versionRange="[6.0.0, 7.0.0)"
-ordering="AFTER"
-side="BOTH"
-[[dependencies.nocreativedrift]]
-modId="mekanism"
-mandatory=false
-versionRange="[10.3.0, 10.4.0)"
-ordering="AFTER"
-side="BOTH"
-[[dependencies.nocreativedrift]]
-modId="controllable"
-mandatory=false
-versionRange="[0.16.1, 0.17.0)"
-ordering="AFTER"
-side="BOTH"
+    modId="controllable"
+    mandatory=false
+    versionRange="[0.20.0, 0.21.0)"
+    ordering="AFTER"
+    side="BOTH"

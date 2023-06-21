@@ -1,21 +1,26 @@
 plugins {
     id 'eclipse'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
-}
-plugins {
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 version = minecraft_version + "-" + mod_version
 group = 'com.github.darkpred.nocreativedrift' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "${mod_name}-forge"
+
+base {
+    archivesName = "${mod_name}-forge"
+}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: 'parchment', version: '2022.11.20-1.19.2'
+    mappings channel: 'official', version: '1.20.1'
+
+    // This property allows configuring Gradle's ProcessResources task(s) to run on IDE output locations before launching the game.
+    // It is REQUIRED to be set to true for this template to function.
+    // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
+    copyIdeResources = true
 
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
@@ -29,7 +34,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                nocreativedrift {
+                "${mod_id}" {
                     source sourceSets.main
                 }
             }
@@ -42,7 +47,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                nocreativedrift {
+                "${mod_id}" {
                     source sourceSets.main
                 }
             }
@@ -55,10 +60,10 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', 'nocreativedrift', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
-                nocreativedrift {
+                "${mod_id}" {
                     source sourceSets.main
                 }
             }
@@ -70,26 +75,44 @@ repositories {
     maven {
         url "https://www.cursemaven.com"
     }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+    }
     maven { url "https://maven.shedaniel.me/" }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
-    compileOnly fg.deobf("curse.maven:ironjetpacks-284497:3910467") //1.19.1-6.0.0
-    compileOnly fg.deobf("curse.maven:cucumber-272335:3910374") //1.19.1-6.0.0
-    compileOnly fg.deobf("curse.maven:mekanism-268560:3922056") //1.19.2-10.3.2.469
-    compileOnly fg.deobf("curse.maven:controllable-317269:3936915") //1.19.2-0.16.
-    implementation fg.deobf("curse.maven:invmove-581854:4346455") //1.19.3-0.8.2
-    runtimeOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:8.2.88") //dep for invmove
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compileOnly fg.deobf("curse.maven:controllable-317269:4598985") //1.20.1-0.20.3
+    compileOnly fg.deobf("curse.maven:framework-549225:4590795") //1.20.1-0.6.5
+    implementation fg.deobf("maven.modrinth:invmove:1.20-0.8.4-forge")
+    runtimeOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:11.0.99") //dep for invmove
 }
+
+def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
+def replaceProperties = [
+        minecraft_version: minecraft_version,
+        forge_version: forge_version,
+        mod_id: mod_id, mod_name: mod_name, mod_version: mod_version
+]
+processResources {
+    inputs.properties replaceProperties
+    replaceProperties.put 'project', project
+
+    filesMatching(resourceTargets) {
+        expand replaceProperties
+    }
+}
+
 jar {
     manifest {
         attributes([
-                "Specification-Title": "nocreativedrift",
+                "Specification-Title": mod_id,
                 "Specification-Vendor": "DarkPred",
                 "Specification-Version": "1", // We are version 1 of ourselves
                 "Implementation-Title": project.name,
-                "Implementation-Version": mod_version,
+                "Implementation-Version": project.jar.archiveVersion,
                 "Implementation-Vendor" :"DarkPred",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
@@ -97,6 +120,21 @@ jar {
 }
 
 jar.finalizedBy('reobfJar')
+
+import net.minecraftforge.gradle.common.tasks.SignJar
+def signJar = tasks.register('signJar', SignJar) {
+    dependsOn jar
+    onlyIf {
+        project.hasProperty('keyStore')
+    }
+    keyStore = project.findProperty('keyStore')
+    alias = project.findProperty('keyStoreAlias')
+    storePass = project.findProperty('keyStorePass')
+    keyPass = project.findProperty('keyStoreKeyPass')
+    inputFile = jar.archiveFile
+    outputFile = jar.archiveFile
+}
+jar.finalizedBy('signJar')
 publishing {
     publications {
         mavenJava(MavenPublication) {

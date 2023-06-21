@@ -1,18 +1,16 @@
 package darkpred.nocreativedrift.client;
 
-import com.blakebr0.ironjetpacks.util.JetpackUtils;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.ButtonBindings;
-import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
+import com.mrcrayfish.controllable.client.input.Controller;
 import darkpred.nocreativedrift.NoCreativeDrift;
 import darkpred.nocreativedrift.config.ClientConfig;
 import me.pieking1215.invmove.InvMove;
-import mekanism.common.item.interfaces.IJetpackItem;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
@@ -130,7 +128,7 @@ public class ClientEventHandler {
         if (NoCreativeDrift.isControllableLoaded() && ClientConfig.isRuleEnabled(ClientConfig.ENABLE_CONTROLLER_SUPPORT)) {
             Controller controller = Controllable.getController();
             if (controller != null) {
-                float deadZone = com.mrcrayfish.controllable.Config.CLIENT.options.deadZone.get().floatValue();
+                float deadZone = Config.CLIENT.client.options.thumbstickDeadZone.get().floatValue();
                 pressed = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
             }
         }
@@ -155,21 +153,12 @@ public class ClientEventHandler {
 
     private static boolean isMekanismJetpackOn(Player player) {
         if (NoCreativeDrift.isMekanismLoaded()) {
-            ItemStack itemStack = IJetpackItem.getActiveJetpack(player);
-            if (!itemStack.isEmpty()) {
-                IJetpackItem.JetpackMode mode = ((IJetpackItem) itemStack.getItem()).getJetpackMode(itemStack);
-                return mode == IJetpackItem.JetpackMode.NORMAL || mode == IJetpackItem.JetpackMode.HOVER;
-            }
         }
         return false;
     }
 
     private static boolean isIronJetpackOn(Player player) {
         if (NoCreativeDrift.isIronJetpacksLoaded()) {
-            ItemStack itemStack = JetpackUtils.getEquippedJetpack(player);
-            if (itemStack.getItem() instanceof com.blakebr0.ironjetpacks.item.JetpackItem) {
-                return JetpackUtils.isFlying(player);
-            }
         }
         return false;
     }
