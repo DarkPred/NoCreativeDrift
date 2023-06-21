@@ -14,6 +14,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Math;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayDeque;
@@ -61,7 +62,7 @@ public class NoCreativeDriftClient implements ClientModInitializer {
             }
         });
 
-        HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> {
+        HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
             if (ClientConfig.CONFIG.getOrDefault("enableHudFading", false)) {
                 if (opacity <= 0) {
                     return;
@@ -69,10 +70,10 @@ public class NoCreativeDriftClient implements ClientModInitializer {
             }
             if (ClientConfig.CONFIG.getOrDefault("enableHudMessage", false)) {
                 MinecraftClient mc = MinecraftClient.getInstance();
-                float yPosition = (float) (0.3 * mc.getWindow().getScaledHeight());
+                int yPosition = (int) (0.3 * mc.getWindow().getScaledHeight());
                 int color = addOpacityToColor(opacity, "EEEBF0");
                 MutableText text = Text.translatable("hud.nocreativedrift.drift_strength", getCurDrift().getText());
-                mc.textRenderer.drawWithShadow(matrixStack, text, 2, yPosition, color);
+                drawContext.drawTextWithShadow(mc.textRenderer, text, 2, yPosition, color);
             }
         });
     }
