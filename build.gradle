@@ -84,6 +84,8 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compileOnly fg.deobf("curse.maven:ironjetpacks-284497:4602093") //1.20.1-7.0.0
+    compileOnly fg.deobf("curse.maven:cucumber-272335:4602089") //1.20.1-7.0.0
     compileOnly fg.deobf("curse.maven:controllable-317269:4598985") //1.20.1-0.20.3
     compileOnly fg.deobf("curse.maven:framework-549225:4590795") //1.20.1-0.6.5
     implementation fg.deobf("maven.modrinth:invmove:1.20-0.8.4-forge")
