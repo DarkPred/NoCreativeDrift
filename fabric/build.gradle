@@ -1,0 +1,119 @@
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
+plugins {
+    id 'fabric-loom' version '1.7-SNAPSHOT'
+    id 'maven-publish'
+    id 'idea'
+    id "com.modrinth.minotaur" version "2.+"
+    id "net.darkhax.curseforgegradle" version "1.1.25"
+}
+
+version = mod_version
+group = maven_group
+
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings(loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_date}@zip")
+    })
+
+    compileOnly project(":common")
+    compileOnly(annotationProcessor('com.google.auto.service:auto-service:1.1.1'))
+
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    Set<String> apiModules = [
+            "fabric-api-base",
+            "fabric-lifecycle-events-v1",
+            "fabric-rendering-v1",
+            "fabric-key-binding-api-v1"
+    ]
+    apiModules.forEach {
+        modCompileOnly(fabricApi.module(it, fabric_api_version))
+    }
+    modRuntimeOnly "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    modImplementation include("maven.modrinth:midnightlib:${midnight_lib_version}")
+
+    /*modRuntimeOnly ("dev.lambdaurora:spruceui:3.3.3+1.18") {
+        transitive = false
+    }
+    api('org.aperlambda:lambdajcommon:1.8.1') {
+        exclude group: 'com.google.code.gson'
+        exclude group: 'com.google.guava'
+    }
+    modRuntimeOnly "maven.modrinth:midnightcontrols:1.5.0+1.18"*/
+}
+
+loom {
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+    }
+    //accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
+}
+
+def properties = [
+        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+        fabric_loader_version: fabric_loader_version, java_version: java_version,
+        mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+        mod_author: mod_author, mod_description: mod_description
+]
+
+processResources {
+    from project(":common").sourceSets.main.resources
+    for (final def property in properties) {
+        inputs.property(property.getKey(), property.getValue())
+    }
+
+    filesMatching("fabric.mod.json") {
+        expand(properties)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    source(project(":common").sourceSets.main.allSource)
+}
+
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN") ?: "no value"
+    projectId = "VPrmY5T9"
+    versionNumber.set("$minecraft_version-$mod_version-${project.name}")
+    versionType.set("release")
+    uploadFile.set(tasks.remapJar)
+    versionName = "$mod_version for Fabric $minecraft_version"
+    gameVersions = game_versions.split(",").toList()
+    debugMode = true
+    dependencies {
+        required.project("fabric-api")
+        embedded.project("midnightlib")
+    }
+    changelog.set(rootProject.file("CHANGELOG.md").text)
+}
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+    group = "publishing"
+    description = "Publishes jar to CurseForge"
+    apiToken = System.getenv("CURSEFORGE_TOKEN") ?: "no value"
+    debugMode = true
+    var mainFile = upload(395069, tasks.remapJar)
+    mainFile.addGameVersion(game_versions.split(","))
+    mainFile.changelog = rootProject.file("CHANGELOG.md").text
+    mainFile.changelogType = "markdown"
+    mainFile.releaseType = "release"
+    mainFile.addRequirement("fabric-api")
+    mainFile.addEmbedded("midnightlib")
+}
+
+tasks.named("publish") {
+    finalizedBy("modrinth", "publishCurseForge")
+}

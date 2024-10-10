@@ -1,0 +1,2 @@
+- Reworked internals
+- Improved compatibility with controllers and other movement mods
