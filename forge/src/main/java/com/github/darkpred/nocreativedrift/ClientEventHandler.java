@@ -21,7 +21,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public static void onKeyInputEvent(InputEvent.KeyInputEvent event) {
+    public static void onKeyInputEvent(InputEvent.Key event) {
         Services.DRIFT_UTIL.toggleDrift(KeyBindList.TOGGLE_DRIFT.isDown());
     }
 }

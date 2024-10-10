@@ -70,13 +70,10 @@ dependencies {
     compileOnly project(":common")
     compileOnly(annotationProcessor('com.google.auto.service:auto-service:1.1.1'))
 
-    compileOnly fg.deobf("curse.maven:simplyjetpacks-251792:3914653") //1.18.2-2.8.0.1
-    compileOnly fg.deobf("maven.modrinth:cucumber:5.1.5")
+    compileOnly fg.deobf("curse.maven:simplyjetpacks-251792:5774756") //1.19.2-2.9.1.1
+    compileOnly fg.deobf("maven.modrinth:cucumber:6.2.4")
     compileOnly fg.deobf("maven.modrinth:iron-jetpacks:${iron_jetpacks_version}")
     compileOnly fg.deobf("maven.modrinth:mekanism:${mekanism_version}")
-
-
-    //runtimeOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:6.4.90") //dep for invmove
 }
 
 tasks.withType(JavaCompile).configureEach {

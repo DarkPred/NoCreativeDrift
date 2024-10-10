@@ -30,20 +30,20 @@ side = "BOTH"
 [[dependencies.${ mod_id }]]
 modId = "simplyjetpacks"
 mandatory = false
-versionRange = "[2.8, 2.9)"
+versionRange = "[2.9, 2.10)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${ mod_id }]]
 modId = "ironjetpacks"
 mandatory = false
-versionRange = "[5, 6)"
+versionRange = "[6, 7)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${ mod_id }]]
 modId = "mekanism"
 mandatory = false
-versionRange = "[10.2, 10.3)"
+versionRange = "[10.3, 10.4)"
 ordering = "NONE"
 side = "BOTH"

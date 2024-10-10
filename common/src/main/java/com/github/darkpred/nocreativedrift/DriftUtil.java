@@ -4,7 +4,8 @@ import com.github.darkpred.nocreativedrift.platform.Services;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -118,7 +119,7 @@ public abstract class DriftUtil {
         Minecraft mc = Minecraft.getInstance();
         float yPosition = (float) (0.3 * mc.getWindow().getGuiScaledHeight());
         int color = addOpacityToColor(hudOpacity, "EEEBF0");
-        TranslatableComponent text = new TranslatableComponent("hud.nocreativedrift.drift_strength", getCurDrift().getText());
+        MutableComponent text = Component.translatable("hud.nocreativedrift.drift_strength", getCurDrift().getText());
         mc.font.drawShadow(poseStack, text, 2, yPosition, color);
     }
 

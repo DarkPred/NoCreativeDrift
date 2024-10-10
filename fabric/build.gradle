@@ -34,15 +34,6 @@ dependencies {
     }
     modRuntimeOnly "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
     modImplementation include("maven.modrinth:midnightlib:${midnight_lib_version}")
-
-    /*modRuntimeOnly ("dev.lambdaurora:spruceui:3.3.3+1.18") {
-        transitive = false
-    }
-    api('org.aperlambda:lambdajcommon:1.8.1') {
-        exclude group: 'com.google.code.gson'
-        exclude group: 'com.google.guava'
-    }
-    modRuntimeOnly "maven.modrinth:midnightcontrols:1.5.0+1.18"*/
 }
 
 loom {
