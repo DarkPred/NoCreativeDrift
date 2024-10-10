@@ -12,6 +12,7 @@ displayURL = "https://www.curseforge.com/minecraft/mc-mods/nocreativedrift"
 logoFile = "logo.png"
 authors = "${mod_author}" #optional
 description = '''${mod_description}'''
+displayTest = "IGNORE_ALL_VERSION"
 
 [[dependencies.${ mod_id }]]
 modId = "neoforge"
@@ -30,7 +31,14 @@ side = "BOTH"
 [[dependencies.${ mod_id }]]
 modId = "mekanism"
 type = "optional"
-versionRange = "[10.5,10.6)"
+versionRange = "[10.6, 10.8)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${ mod_id }]]
+modId = "ironjetpacks"
+type = "optional"
+versionRange = "[8, 9)"
 ordering = "NONE"
 side = "BOTH"
 

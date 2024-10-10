@@ -2,9 +2,9 @@ import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
 plugins {
     id 'multiloader-loader'
-    id 'fabric-loom' version '1.7-SNAPSHOT'
-    id "com.modrinth.minotaur" version "2.+"
-    id "net.darkhax.curseforgegradle" version "1.1.25"
+    id 'fabric-loom'
+    id "com.modrinth.minotaur"
+    id "net.darkhax.curseforgegradle"
 }
 
 dependencies {
@@ -27,7 +27,7 @@ dependencies {
         modCompileOnly(fabricApi.module(it, fabric_api_version))
     }
     modRuntimeOnly "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
-    modImplementation include("maven.modrinth:midnightlib:${midnight_lib_version}")
+    modImplementation include("maven.modrinth:midnightlib:${midnight_lib_version}-fabric")
 }
 
 loom {

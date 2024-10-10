@@ -48,4 +48,4 @@ plugins {
 }
 
 rootProject.name = "NoCreativeDrift"
-include("common", "fabric", "forge", "neoforge")
+include("common", "fabric", "neoforge")

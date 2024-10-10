@@ -4,18 +4,18 @@ import com.github.darkpred.nocreativedrift.platform.Services;
 import net.minecraft.client.player.LocalPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class ClientEventHandler {
 
     @SubscribeEvent
-    public static void onPlayerTickEvent(TickEvent.PlayerTickEvent event) {
+    public static void onPlayerTickEvent(PlayerTickEvent.Post event) {
         //Ensures that the code is only run once on the logical client
-        if (event.phase == TickEvent.Phase.END && event.side.isClient()) {
-            Services.DRIFT_UTIL.onClientPlayerTick((LocalPlayer) event.player);
+        if (event.getEntity() instanceof LocalPlayer localPlayer) {
+            Services.DRIFT_UTIL.onClientPlayerTick(localPlayer);
         }
     }
 

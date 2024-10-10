@@ -1,6 +1,7 @@
 package com.github.darkpred.nocreativedrift;
 
 import com.github.darkpred.nocreativedrift.platform.Services;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
@@ -109,7 +110,7 @@ public abstract class DriftUtil {
         return ret;
     }
 
-    public void render(GuiGraphics guiGraphics, float partialTick) {
+    public void render(GuiGraphics guiGraphics, DeltaTracker partialTick) {
         if (!Services.CONFIG.enableHudMessage()) {
             return;
         }
