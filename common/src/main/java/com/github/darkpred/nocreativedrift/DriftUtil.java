@@ -1,8 +1,8 @@
 package com.github.darkpred.nocreativedrift;
 
 import com.github.darkpred.nocreativedrift.platform.Services;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -109,7 +109,7 @@ public abstract class DriftUtil {
         return ret;
     }
 
-    public void render(PoseStack poseStack, float partialTick) {
+    public void render(GuiGraphics guiGraphics, float partialTick) {
         if (!Services.CONFIG.enableHudMessage()) {
             return;
         }
@@ -117,10 +117,10 @@ public abstract class DriftUtil {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
-        float yPosition = (float) (0.3 * mc.getWindow().getGuiScaledHeight());
+        int yPosition = (int) (0.3 * mc.getWindow().getGuiScaledHeight());
         int color = addOpacityToColor(hudOpacity, "EEEBF0");
         MutableComponent text = Component.translatable("hud.nocreativedrift.drift_strength", getCurDrift().getText());
-        mc.font.drawShadow(poseStack, text, 2, yPosition, color);
+        guiGraphics.drawString(mc.font, text, 2, yPosition, color);
     }
 
     /**

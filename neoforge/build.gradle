@@ -1,0 +1,91 @@
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.gradle.userdev' version '7.0.107'
+    id "com.modrinth.minotaur" version "2.+"
+    id "net.darkhax.curseforgegradle" version "1.1.25"
+}
+
+def at = file('src/main/resources/META-INF/accesstransformer.cfg')
+if (at.exists()) {
+    minecraft.accessTransformers.file at
+}
+runs {
+    configureEach {
+        modSource project.sourceSets.main
+    }
+    client {
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+    server {
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        programArgument '--nogui'
+    }
+
+    gameTestServer {
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    data {
+        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neoforge_version}"
+    compileOnly(annotationProcessor('com.google.auto.service:auto-service:1.1.1'))
+
+    compileOnly "maven.modrinth:mekanism:${mekanism_version}"
+    //localRuntime
+}
+
+tasks.withType(JavaCompile).configureEach {
+    source(project(":common").sourceSets.main.allSource)
+}
+
+javadoc {
+    source project(":common").sourceSets.main.allJava
+    source project.sourceSets.main.allJava
+    options.addBooleanOption('-ignore-source-errors', true)
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
+
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN") ?: "no value"
+    projectId = "VPrmY5T9"
+    versionNumber.set("$minecraft_version-$mod_version-${project.name}")
+    versionType.set("release")
+    uploadFile.set(tasks.jar)
+    versionName = "$mod_version for NeoForge $minecraft_version"
+    gameVersions = game_versions.split(",").toList()
+    debugMode = true
+    dependencies {
+        optional.project("mekanism")
+    }
+    changelog.set(rootProject.file("CHANGELOG.md").text)
+}
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+    group = "publishing"
+    description = "Publishes jar to CurseForge"
+    apiToken = System.getenv("CURSEFORGE_TOKEN") ?: "no value"
+    debugMode = true
+    var mainFile = upload(395069, tasks.jar)
+    mainFile.addGameVersion(game_versions.split(","))
+    mainFile.changelog = rootProject.file("CHANGELOG.md").text
+    mainFile.changelogType = "markdown"
+    mainFile.releaseType = "release"
+    mainFile.addOptional("mekanism")
+}
+
+tasks.named("publish") {
+    finalizedBy("modrinth", "publishCurseForge")
+}

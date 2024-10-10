@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "${forge_loader_version_range}"
+loaderVersion = "${neoforge_loader_version_range}"
 license = "${mod_license}"
 issueTrackerURL = "https://github.com/DarkPred/NoCreativeDrift/issues"
 
@@ -14,50 +14,23 @@ authors = "${mod_author}" #optional
 description = '''${mod_description}'''
 
 [[dependencies.${ mod_id }]]
-modId = "forge"
-mandatory = true
-versionRange = "${forge_version_range}"
+modId = "neoforge"
+type = "required"
+versionRange = "${neoforge_loader_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${ mod_id }]]
 modId = "minecraft"
-mandatory = true
+type = "required"
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${ mod_id }]]
-modId = "simplyjetpacks"
-mandatory = false
-versionRange = "[2.10, 2.11)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.${ mod_id }]]
-modId = "ironjetpacks"
-mandatory = false
-versionRange = "[7, 8)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.${ mod_id }]]
-modId = "simplyjetpacks"
-mandatory = false
-versionRange = "[2.9, 2.10)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.${ mod_id }]]
-modId = "ironjetpacks"
-mandatory = false
-versionRange = "[6, 7)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.${ mod_id }]]
 modId = "mekanism"
-mandatory = false
-versionRange = "[10.3, 10.4)"
+type = "optional"
+versionRange = "[10.5,10.6)"
 ordering = "NONE"
 side = "BOTH"
+

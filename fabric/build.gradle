@@ -1,25 +1,19 @@
 import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
 plugins {
+    id 'multiloader-loader'
     id 'fabric-loom' version '1.7-SNAPSHOT'
-    id 'maven-publish'
-    id 'idea'
     id "com.modrinth.minotaur" version "2.+"
     id "net.darkhax.curseforgegradle" version "1.1.25"
 }
-
-version = mod_version
-group = maven_group
-
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_date}@zip")
+        parchment("org.parchmentmc.data:parchment-${parchment_mc_version}:${parchment_date}@zip")
     })
 
-    compileOnly project(":common")
     compileOnly(annotationProcessor('com.google.auto.service:auto-service:1.1.1'))
 
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
@@ -37,43 +31,27 @@ dependencies {
 }
 
 loom {
+    def aw = project(":common").file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
+    }
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
+    }
     runs {
         client {
             client()
             setConfigName("Fabric Client")
             ideConfigGenerated(true)
-            runDir("run")
+            runDir("runs/client")
         }
         server {
             server()
             setConfigName("Fabric Server")
             ideConfigGenerated(true)
-            runDir("run")
+            runDir("runs/server")
         }
     }
-    //accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
-}
-
-def properties = [
-        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-        fabric_loader_version: fabric_loader_version, java_version: java_version,
-        mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-        mod_author: mod_author, mod_description: mod_description
-]
-
-processResources {
-    from project(":common").sourceSets.main.resources
-    for (final def property in properties) {
-        inputs.property(property.getKey(), property.getValue())
-    }
-
-    filesMatching("fabric.mod.json") {
-        expand(properties)
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    source(project(":common").sourceSets.main.allSource)
 }
 
 modrinth {
