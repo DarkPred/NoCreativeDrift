@@ -72,7 +72,7 @@ modrinth {
     uploadFile.set(tasks.jar)
     versionName = "$mod_version for NeoForge $minecraft_version"
     gameVersions = game_versions.split(",").toList()
-    loaders = ["NeoForge"]
+    loaders = ["neoforge"]
     debugMode = true
     dependencies {
         optional.project("mekanism")
@@ -87,6 +87,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     debugMode = true
     var mainFile = upload(395069, tasks.jar)
     mainFile.addGameVersion(game_versions.split(","))
+    mainFile.addEnvironment("Client")
     mainFile.addModLoader("NeoForge")
     mainFile.changelog = rootProject.file("CHANGELOG.md").text
     mainFile.changelogType = "markdown"
