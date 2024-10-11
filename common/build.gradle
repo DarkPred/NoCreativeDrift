@@ -1,14 +1,13 @@
 plugins {
     id 'multiloader-common'
-    id 'net.neoforged.moddev' version '2.0.36-beta'
+    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
 }
 
-neoForge {
-    // Look for versions on https://projects.neoforged.net/neoforged/neoform
-    neoFormVersion = neo_form_version
-    parchment {
-        minecraftVersion = parchment_mc_version
-        mappingsVersion = parchment_date
+minecraft {
+    version(minecraft_version)
+    def aw = file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWideners(aw)
     }
 }
 
