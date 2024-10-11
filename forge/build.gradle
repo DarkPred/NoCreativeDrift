@@ -81,7 +81,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 def properties = [
-        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+        minecraft_version: minecraft_version, minecraft_version_range_lower: minecraft_version_range_lower,
+        minecraft_version_range_upper: minecraft_version_range_upper,
         loader_version: forge_loader_version_range, forge_version_range: forge_version_range,
         mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
         mod_author: mod_author, mod_description: mod_description
@@ -129,6 +130,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     debugMode = true
     var mainFile = upload(395069, tasks.jar)
     mainFile.addGameVersion(game_versions.split(","))
+    mainFile.addEnvironment("Client")
     mainFile.changelog = rootProject.file("CHANGELOG.md").text
     mainFile.changelogType = "markdown"
     mainFile.releaseType = "release"
