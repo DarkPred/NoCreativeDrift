@@ -86,6 +86,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     apiToken = System.getenv("CURSEFORGE_TOKEN") ?: "no value"
     debugMode = true
     var mainFile = upload(395069, tasks.jar)
+    mainFile.displayName = "NoCreativeDrift-$minecraft_version-$mod_version-${project.name}"
     mainFile.addGameVersion(game_versions.split(","))
     mainFile.addEnvironment("Client")
     mainFile.addModLoader("NeoForge")
