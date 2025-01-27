@@ -1,10 +1,7 @@
 package com.github.darkpred.nocreativedrift;
 
-import com.blakebr0.ironjetpacks.util.JetpackUtils;
 import com.google.auto.service.AutoService;
-import mekanism.common.item.interfaces.IJetpackItem;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 
 @AutoService(DriftUtil.class)

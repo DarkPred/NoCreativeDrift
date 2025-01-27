@@ -74,8 +74,8 @@ modrinth {
     loaders = ["neoforge"]
     debugMode = true
     dependencies {
-        optional.project("mekanism")
-        optional.project("iron-jetpacks")
+        //optional.project("mekanism")
+        //optional.project("iron-jetpacks")
     }
     changelog.set(rootProject.file("CHANGELOG.md").text)
 }
@@ -92,7 +92,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     mainFile.changelog = rootProject.file("CHANGELOG.md").text
     mainFile.changelogType = "markdown"
     mainFile.releaseType = "release"
-    mainFile.addOptional("mekanism", "iron-jetpacks")
+    //mainFile.addOptional("mekanism", "iron-jetpacks")
 }
 
 tasks.named("publish") {
