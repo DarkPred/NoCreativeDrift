@@ -8,11 +8,11 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class FabricNoCreativeDriftModClient implements ClientModInitializer {
-    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(NoCreativeDriftMod.MOD_ID, "drift"));
+    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(NoCreativeDriftMod.MOD_ID, "drift"));
     private static final KeyMapping toggleDrift = new KeyMapping(
             "key.nocreativedrift.toggle_drift", GLFW.GLFW_KEY_C, CATEGORY);
 
@@ -33,6 +33,6 @@ public class FabricNoCreativeDriftModClient implements ClientModInitializer {
             Services.DRIFT_UTIL.onClientPlayerTick(player);
         });
 
-        HudElementRegistry.attachElementAfter(VanillaHudElements.HOTBAR, ResourceLocation.fromNamespaceAndPath(NoCreativeDriftMod.MOD_ID, "drift_hud"), Services.DRIFT_UTIL::render);
+        HudElementRegistry.attachElementAfter(VanillaHudElements.HOTBAR, Identifier.fromNamespaceAndPath(NoCreativeDriftMod.MOD_ID, "drift_hud"), Services.DRIFT_UTIL::render);
     }
 }

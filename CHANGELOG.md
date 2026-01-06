@@ -1,2 +1,2 @@
 ### Added
-- Support for 1.21.9 and 1.21.10
+- Support for 1.21.11

@@ -1,7 +1,7 @@
 package com.github.darkpred.nocreativedrift;
 
 import com.github.darkpred.nocreativedrift.platform.Services;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -14,7 +14,7 @@ public class ClientRegistration {
 
     @SubscribeEvent
     public static void onRegisterGuiOverlaysEvent(RegisterGuiLayersEvent event) {
-        event.registerAbove(VanillaGuiLayers.HOTBAR, ResourceLocation.fromNamespaceAndPath(NoCreativeDriftMod.MOD_ID, "drift_hud"),
+        event.registerAbove(VanillaGuiLayers.HOTBAR, Identifier.fromNamespaceAndPath(NoCreativeDriftMod.MOD_ID, "drift_hud"),
                 Services.DRIFT_UTIL::render);
     }
 
