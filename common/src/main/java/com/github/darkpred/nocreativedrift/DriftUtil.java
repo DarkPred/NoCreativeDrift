@@ -18,10 +18,10 @@ import static com.github.darkpred.nocreativedrift.platform.Services.CONFIG;
 
 public abstract class DriftUtil {
     private final Deque<Drift> driftDeque = new ArrayDeque<>();
-    protected boolean keyJumpPressed = false;
-    protected boolean keySneakPressed = false;
-    protected boolean keyToggleDriftPressed = false;
-    protected float hudOpacity = 5.0f;
+    private boolean keyJumpPressed = false;
+    private boolean keySneakPressed = false;
+    private boolean keyToggleDriftPressed = false;
+    private float hudOpacity = 5.0f;
 
     protected DriftUtil() {
         //Init drift strength order
@@ -90,7 +90,7 @@ public abstract class DriftUtil {
     }
 
     protected boolean horizontalControlsUsed(LocalPlayer player) {
-        return Math.abs(player.input.forwardImpulse) > Mth.EPSILON || Math.abs(player.input.leftImpulse) > Mth.EPSILON;
+        return Math.abs(player.input.getMoveVector().y) > Mth.EPSILON || Math.abs(player.input.getMoveVector().x) > Mth.EPSILON;
     }
 
     protected boolean isJumpPressed(LocalPlayer player) {
