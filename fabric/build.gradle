@@ -55,7 +55,7 @@ loom {
 }
 
 modrinth {
-    token = System.getenv("MODRINTH_TOKEN") ?: "no value"
+    token = "${project.property("MODRINTH_TOKEN")}" ?: "no value"
     projectId = "VPrmY5T9"
     versionNumber.set("$minecraft_version-$mod_version-${project.name}")
     versionType.set("release")
@@ -72,10 +72,10 @@ modrinth {
 tasks.register('publishCurseForge', TaskPublishCurseForge) {
     group = "publishing"
     description = "Publishes jar to CurseForge"
-    apiToken = System.getenv("CURSEFORGE_TOKEN") ?: "no value"
+    apiToken = project.property("CURSEFORGE_TOKEN") ?: "no value"
     debugMode = true
     var mainFile = upload(395069, tasks.remapJar)
-    mainFile.displayName = "NoCreativeDrift-$minecraft_version-$mod_version-${project.name}"
+    mainFile.displayName = "$mod_version for Fabric $minecraft_version"
     mainFile.addGameVersion(game_versions.split(","))
     mainFile.addEnvironment("Client")
     mainFile.changelog = rootProject.file("CHANGELOG.md").text
