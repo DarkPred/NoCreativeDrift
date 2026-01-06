@@ -24,18 +24,18 @@ public class NeoForgeDriftUtil extends DriftUtil {
 
     private boolean isMekanismJetpackOn(Player player) {
         if (mekanismLoaded) {
-            ItemStack itemStack = IJetpackItem.getPrimaryJetpack(player);
+            /*ItemStack itemStack = IJetpackItem.getPrimaryJetpack(player);
             if (!itemStack.isEmpty()) {
                 IJetpackItem.JetpackMode mode = ((IJetpackItem) itemStack.getItem()).getJetpackMode(itemStack);
                 return mode == IJetpackItem.JetpackMode.NORMAL || mode == IJetpackItem.JetpackMode.HOVER;
-            }
+            }*/
         }
         return false;
     }
 
     private boolean isIronJetpackOn(Player player) {
         if (ironJetpacksLoaded) {
-            return JetpackUtils.isFlying(player);
+            //return JetpackUtils.isFlying(player);
         }
         return false;
     }

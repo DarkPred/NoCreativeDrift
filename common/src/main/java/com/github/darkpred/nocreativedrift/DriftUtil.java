@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -89,15 +90,15 @@ public abstract class DriftUtil {
     }
 
     protected boolean horizontalControlsUsed(LocalPlayer player) {
-        return player.input.up || player.input.down || player.input.left || player.input.right;
+        return Math.abs(player.input.forwardImpulse) > Mth.EPSILON || Math.abs(player.input.leftImpulse) > Mth.EPSILON;
     }
 
     protected boolean isJumpPressed(LocalPlayer player) {
-        return player.input.jumping;
+        return player.input.keyPresses.jump();
     }
 
     protected boolean isSneakPressed(LocalPlayer player) {
-        return player.input.shiftKeyDown;
+        return player.input.keyPresses.shift();
     }
 
     /**

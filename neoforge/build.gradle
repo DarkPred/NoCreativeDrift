@@ -26,11 +26,13 @@ neoForge {
         client {
             client()
         }
-        data {
-            data()
-        }
+
         server {
             server()
+        }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
         }
     }
     mods {
@@ -45,9 +47,6 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     compileOnly(annotationProcessor('com.google.auto.service:auto-service:1.1.1'))
-
-    compileOnly "maven.modrinth:mekanism:${mekanism_version}"
-    compileOnly "maven.modrinth:iron-jetpacks:${iron_jetpacks_version}"
     //localRuntime
 }
 
