@@ -12,8 +12,9 @@ import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 
 public class FabricNoCreativeDriftModClient implements ClientModInitializer {
+    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(NoCreativeDriftMod.MOD_ID, "drift"));
     private static final KeyMapping toggleDrift = new KeyMapping(
-            "key.nocreativedrift.toggle_drift", GLFW.GLFW_KEY_C, "No Creative Drift");
+            "key.nocreativedrift.toggle_drift", GLFW.GLFW_KEY_C, CATEGORY);
 
     @Override
     public void onInitializeClient() {

@@ -21,6 +21,7 @@ public class ClientRegistration {
     @SubscribeEvent
     public static void onRegisterKeyMappingsEvent(RegisterKeyMappingsEvent event) {
         if (Services.CONFIG.enableToggleKeyBind()) {
+            event.registerCategory(KeyBindList.CATEGORY);
             event.register(KeyBindList.TOGGLE_DRIFT);
         }
     }

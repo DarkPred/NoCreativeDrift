@@ -7,8 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 
 public class KeyBindList {
-
+    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath(NoCreativeDriftMod.MOD_ID, "main"));
     public static final KeyMapping TOGGLE_DRIFT = new KeyMapping(
             Util.makeDescriptionId("key", ResourceLocation.fromNamespaceAndPath(NoCreativeDriftMod.MOD_ID, "toggle_drift")),
-            KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, InputConstants.KEY_C, "key.nocreativedrift.category");
+            KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, InputConstants.KEY_C, CATEGORY);
 }
