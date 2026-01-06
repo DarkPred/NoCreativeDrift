@@ -100,6 +100,9 @@ public abstract class DriftUtil {
         return player.input.shiftKeyDown;
     }
 
+    /**
+     * Platform depended based on available mods
+     */
     protected abstract boolean isJetpackOn(Player player);
 
     public Drift getCurDrift() {

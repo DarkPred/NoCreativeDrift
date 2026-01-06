@@ -1,5 +1,8 @@
 package com.github.darkpred.nocreativedrift;
 
+/**
+ * Interface holding the client config entries
+ */
 public interface ClientConfig {
     boolean disableVerticalDrift();
 

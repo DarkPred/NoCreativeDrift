@@ -3,6 +3,9 @@ package com.github.darkpred.nocreativedrift;
 import com.google.auto.service.AutoService;
 import eu.midnightdust.lib.config.MidnightConfig;
 
+/**
+ * Class holding the client config entries
+ */
 @AutoService(ClientConfig.class)
 public class FabricClientConfig extends MidnightConfig implements ClientConfig {
 
