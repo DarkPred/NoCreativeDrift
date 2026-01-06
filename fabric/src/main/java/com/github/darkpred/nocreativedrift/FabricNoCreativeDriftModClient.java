@@ -24,7 +24,9 @@ public class FabricNoCreativeDriftModClient implements ClientModInitializer {
             if (player == null) {
                 return;
             }
-            Services.DRIFT_UTIL.toggleDrift(toggleDrift.isDown());
+            if (Services.CONFIG.enableToggleKeyBind()) {
+                Services.DRIFT_UTIL.toggleDrift(toggleDrift.isDown());
+            }
             Services.DRIFT_UTIL.onClientPlayerTick(player);
         });
 

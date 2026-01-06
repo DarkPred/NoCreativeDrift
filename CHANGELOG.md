@@ -1,2 +1,3 @@
-- Reworked internals
-- Improved compatibility with controllers and other movement mods
+### Fixed
+- Key bind config option not working
+- Missing translation in fabric config

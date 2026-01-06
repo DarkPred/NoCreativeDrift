@@ -20,6 +20,8 @@ public class ClientRegistration {
 
     @SubscribeEvent
     public static void onRegisterKeyMappingsEvent(RegisterKeyMappingsEvent event) {
-        event.register(KeyBindList.TOGGLE_DRIFT);
+        if (Services.CONFIG.enableToggleKeyBind()) {
+            event.register(KeyBindList.TOGGLE_DRIFT);
+        }
     }
 }
