@@ -4,9 +4,11 @@ import com.github.darkpred.nocreativedrift.platform.Services;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 
 public class FabricNoCreativeDriftModClient implements ClientModInitializer {
@@ -30,6 +32,6 @@ public class FabricNoCreativeDriftModClient implements ClientModInitializer {
             Services.DRIFT_UTIL.onClientPlayerTick(player);
         });
 
-        HudRenderCallback.EVENT.register(Services.DRIFT_UTIL::render);
+        HudElementRegistry.attachElementAfter(VanillaHudElements.HOTBAR, ResourceLocation.fromNamespaceAndPath(NoCreativeDriftMod.MOD_ID, "drift_hud"), Services.DRIFT_UTIL::render);
     }
 }

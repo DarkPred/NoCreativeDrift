@@ -1,3 +1,2 @@
-### Fixed
-- Key bind config option not working
-- Missing translation in fabric config
+### Added
+- Support for 1.21.6, 1.21.7 and 1.21.8

@@ -1,6 +1,6 @@
 plugins {
-    id 'fabric-loom' version '1.10-SNAPSHOT' apply false
-    id 'net.neoforged.moddev' version '2.0.36-beta' apply false
+    id 'fabric-loom' version '1.14-SNAPSHOT' apply false
+    id 'net.neoforged.moddev' version '2.0.137' apply false
     // Required for NeoGradle
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.7"
     id "com.modrinth.minotaur" version "2.+" apply false
